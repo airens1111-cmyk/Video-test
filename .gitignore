@@ -1,0 +1,4 @@
+node_modules/
+video/.tts_cache/
+video/out/
+__pycache__/

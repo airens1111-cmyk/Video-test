@@ -1,0 +1,4 @@
+node_modules/
+__pycache__/
+video/out/
+samples/music/*.wav

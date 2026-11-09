@@ -18,6 +18,7 @@ This is their story. [P]
 The kingdom was Kartli-Kakheti. [p] Its king, Erekle the Second, was seventy-five years old. [p] He had fought for half a century. [P]
 Now Agha Mohammad Khan, ruler of the Qajar state, demanded that Georgia return to Persian rule. [p] Erekle refused. [P]
 By treaty, Russia had promised to protect Georgia. [p] Its help never came. [P]
+> **ИРАКЛИЙ II (драматизация, другой голос):** *Russia promised to protect us. [p] Now we stand alone.* [P]
 
 **S3 · 0:50–1:15**
 Historians estimate the Qajar army at thirty to forty thousand. [p]
@@ -50,7 +51,7 @@ In two thousand eight, the Georgian Church named the three hundred Aragvians hol
 A monument stands where their graves were found. [p] A metro station bears their name. [P]
 Three hundred. [p] Remember them.
 
-*Объём: ~310 слов. При rate −10% (~125 сл/мин) + паузы ≈ 2:55–3:05. Если выйдет длиннее — сокращу S2 («He had fought for half a century»).*
+*Объём: ~320 слов. При rate −10% (~125 сл/мин) + паузы ≈ 2:55–3:05. Если выйдет длиннее — сокращу S2 («He had fought for half a century»).*
 
 ---
 
@@ -67,6 +68,7 @@ Three hundred. [p] Remember them.
 | 0:32–0:40 | S2b | Воксельный царь Ираклий II (седая борода, корона-обруч) в шатре/на коне, крупный план | «Erekle II · aged 75» | |
 | 0:40–0:46 | S2c | Карта: стрелки с юга (через Аракс) к Тбилиси | «Agha Mohammad Khan» | глухие барабаны |
 | 0:46–0:50 | S2d | Карта: с севера пунктир «Russia, 1783» гаснет, обрывается | «Treaty of Georgievsk, 1783» | пауза, тишина |
+| 0:50–0:55 | S2e | Крупный план Ираклия у карты в шатре, свеча; он поднимает глаза | субтитр курсивом с пометкой *(dramatized)* | реплика царя, тишина |
 | 0:50–1:00 | S3a | Сплит-кадр: два блока войск, счётчики | «≈30–40,000» vs «≈5,000» | |
 | 1:00–1:06 | S3b | Отряд в зелёном у Соломона II | «Imereti · Solomon II» | |
 | 1:06–1:15 | S3c | Горцы Арагви спускаются по горной тропе в долину, камера над рекой | «Aragvi valley» | рога, нарастание |
@@ -86,6 +88,7 @@ Three hundred. [p] Remember them.
 | 2:57–3:05 | S8 | Финальная карточка: аватар «კლონი», «Follow for more history», надпись о драматизации | «კლონი» · «Follow» · «Dramatized, based on historical accounts» | последний аккорд |
 
 ## Заметки
+- Реплика Ираклия — **не историческая цитата**, а драматизация подтверждённого факта (sources.md, п. 4 и п. 21). Субтитр курсивом с пометкой «dramatized», без кавычек. Сцены S3–S8 сдвигаются на ~5 с позже; хронометраж сожму в S4, где закадр короче картинки.
 - Ранение царя не подтверждено (см. sources.md, п. 13) → в закадре его нет, сцена S6b «царя уводят» плюс пометка о драматизации.
 - «Знамя шаха» заменено на «khan's banner»: в 1795 г. Ага-Мохаммед ещё не был коронован (коронация в 1796 г.); подано как предание.
 - Все числа в кадре совпадают с sources.md: 30–40 000 / ≈5 000 / ≈15 000 пленных / 27.06.2008 / 11 сент. (24 сент.) / 1959 / 1967.

@@ -80,9 +80,9 @@ const Inner: React.FC<WorldShotProps & { data: TerrainData; t: number; width: nu
     <AbsoluteFill style={{ background: "#000" }}>
       <ThreeCanvas width={p.width} height={p.height} shadows gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }} camera={{ fov: 40, near: 0.3, far: 40000 }}>
         <CamApply move={p.move} t={t} data={data} />
-        <Atmosphere preset={preset} t={st} focus={cs.target} fogBase={data.surface(cs.target.x, cs.target.z) - 25} shadowSize={Math.min(900, Math.max(120, cs.pos.distanceTo(cs.target) * 0.9))} />
+        <Atmosphere preset={preset} t={st} focus={cs.target} fogBase={data.surface(cs.target.x, cs.target.z) - 25} shadowSize={Math.min(900, Math.max(120, cs.pos.distanceTo(cs.target) * 0.9))} shadowRes={p.quality === "final" ? 2048 : 1024} />
         <Terrain data={data} cam={cam} lodK={p.quality === "final" ? 2.2 : 1.6} />
-        <Vegetation data={data} cam={cam} radius={p.quality === "final" ? 2400 : 1600} />
+        <Vegetation data={data} cam={cam} radius={p.quality === "final" ? 2200 : 1300} />
         {p.region === "tbilisi" ? <City data={data} burn={p.burn ?? 0} /> : <AragviSettlements data={data} />}
         {p.memorial ? <MemorialStone data={data} /> : null}
         {p.burn ? <CityGlow t={st} data={data} /> : null}

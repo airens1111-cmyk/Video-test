@@ -70,7 +70,11 @@ export const Vegetation: React.FC<{ data: TerrainData; cam: THREE.Vector3; radiu
       const dist = Math.hypot(Math.max(0, Math.abs(cam.x - (ox + A / 2)) - A / 2), Math.max(0, Math.abs(cam.z - (oz + A / 2)) - A / 2));
       if (dist > radius) continue;
       const v = vegCache(data, ox, oz, A, dist < 450);
-      for (const k of KINDS) if (k !== "grass") merged[k].push(...v[k]);
+      if (dist < 500) { for (const k of KINDS) if (k !== "grass") merged[k].push(...v[k]); continue; }
+      // far LOD: every 3rd crown only (no trunks, no secondary blocks), a bit larger; houses/stone kept
+      const step = dist < 1200 ? 2 : 4;
+      v.leaves.forEach((b, i) => { if (i % (step * 2) === 0) merged.leaves.push({ ...b, sx: b.sx * 1.25, sy: b.sy * 1.15, sz: b.sz * 1.25 }); });
+      for (const k of ["plaster", "roof", "stone", "tuff", "tile", "wood"] as Kind[]) merged[k].push(...v[k]);
     }
     return merged;
     // eslint-disable-next-line react-hooks/exhaustive-deps

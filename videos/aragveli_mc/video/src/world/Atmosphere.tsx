@@ -31,7 +31,7 @@ void main(){
   gl_FragColor = vec4(col, 1.);
 }`;
 
-export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vector3; fogBase?: number; shadowSize?: number; cloudArea?: number }> = ({ preset, t, focus, fogBase = 0, shadowSize = 600, cloudArea = 16000 }) => {
+export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vector3; fogBase?: number; shadowSize?: number; cloudArea?: number; shadowRes?: number }> = ({ preset, t, focus, fogBase = 0, shadowSize = 600, cloudArea = 16000, shadowRes = 2048 }) => {
   const { scene } = useThree();
   const sun = useRef<THREE.DirectionalLight>(null);
   const moon = useRef<THREE.DirectionalLight>(null);
@@ -79,7 +79,7 @@ export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vect
     <>
       <mesh material={skyMat} scale={30000} frustumCulled={false} renderOrder={-10}><sphereGeometry args={[1, 32, 16]} /></mesh>
       <hemisphereLight ref={hemi} />
-      <directionalLight ref={sun} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0006} shadow-normalBias={0.6} />
+      <directionalLight ref={sun} castShadow shadow-mapSize={[shadowRes, shadowRes]} shadow-bias={-0.0006} shadow-normalBias={0.6} />
       <directionalLight ref={moon} castShadow={false} />
       <VoxelClouds preset={preset} t={t} area={cloudArea} center={focus} />
     </>

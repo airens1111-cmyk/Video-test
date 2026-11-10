@@ -22,10 +22,17 @@ export interface WorldShotProps {
   letterbox?: number; debug?: boolean; tOffset?: number; quality?: "draft" | "final";
 }
 
+/** Ground for the camera: never below the top of any 5 m block within 8 m (avoids looking into a block face). */
+export const camGround = (data: TerrainData) => (x: number, z: number) => {
+  let m = data.surface(x, z);
+  for (const dx of [-8, 0, 8]) for (const dz of [-8, 0, 8]) m = Math.max(m, data.top(x + dx, z + dz) + 5);
+  return m;
+};
+
 const CamApply: React.FC<{ move: Move; t: number; data: TerrainData }> = ({ move, t, data }) => {
   const { camera, size } = useThree();
   useLayoutEffect(() => {
-    const s = evalMove(move, t, (x, z) => data.surface(x, z));
+    const s = evalMove(move, t, camGround(data));
     const cam = camera as THREE.PerspectiveCamera;
     cam.near = 0.3; cam.far = 40000;
     applyCamera(cam, s, size.width / size.height, move);
@@ -45,7 +52,7 @@ export const WorldShot: React.FC<WorldShotProps> = (p) => {
 const Inner: React.FC<WorldShotProps & { data: TerrainData; t: number; width: number; height: number; frame: number }> = (p) => {
   const { data, t } = p;
   const preset = PRESETS[p.preset];
-  const cs = evalMove(p.move, t, (x, z) => data.surface(x, z));
+  const cs = evalMove(p.move, t, camGround(data));
   const st = simTime(p.move, t);
   const cam = cs.pos;
   const wa = THREE.MathUtils.degToRad(preset.wind.dir);

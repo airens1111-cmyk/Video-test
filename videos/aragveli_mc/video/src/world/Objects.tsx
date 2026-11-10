@@ -98,7 +98,7 @@ export const Vegetation: React.FC<{ data: TerrainData; cam: THREE.Vector3; radiu
   const clear = useMemo(() => {
     if (!lowCam) return sets;
     const out = {} as Record<Kind, Box[]>;
-    for (const k of KINDS) out[k] = sets[k].filter((b) => Math.hypot(b.x - cam.x, b.z - cam.z) > 8 + Math.max(b.sx, b.sz) / 2);
+    for (const k of KINDS) out[k] = sets[k].filter((b) => Math.hypot(b.x - cam.x, b.z - cam.z) > 16 + Math.max(b.sx, b.sz) / 2);
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sets, ck]);

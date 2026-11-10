@@ -64,9 +64,9 @@ const Inner: React.FC<WorldShotProps & { data: TerrainData; t: number; width: nu
   const houses = useMemo(() => (p.burn ? burningHouses(data, p.burn, 400) : []), [data, p.burn]);
   if (p.burn) {
     const near = [...houses].sort((a, b) => a.distanceTo(cs.target) - b.distanceTo(cs.target));
-    near.slice(0, 90).forEach((h, i) => emitters.push(fire(1000 + i, h, 0.8 + (i % 3) * 0.25)));
-    near.filter((_, i) => i % 5 === 0).slice(0, 30).forEach((h, i) => emitters.push(smoke(2000 + i, h, 2.2, 0.85)));
-    emitters.push(embers(3000, () => new THREE.Vector3(-4700, data.top(-4700, -4350), -4350), 520, 260 * (P.embers || 1), 8));
+    near.filter((_, i) => i % 3 === 0).slice(0, 60).forEach((h, i) => emitters.push(fire(1000 + i, h, 1.6 + (i % 3) * 0.5)));
+    near.filter((_, i) => i % 4 === 0).slice(0, 40).forEach((h, i) => emitters.push(smoke(2000 + i, h, 3.0, 0.9)));
+    emitters.push(embers(3000, () => new THREE.Vector3(-4700, data.top(-4700, -4350), -4350), 300, 70 * (P.embers || 1), 12));
   }
   if (p.dustRoad) {
     // dust raised on the southern road by an (unseen) approaching column — the trail module armies will use later
@@ -109,7 +109,7 @@ const CityGlow: React.FC<{ t: number; data: TerrainData }> = ({ t, data }) => {
   return (
     <>
       {pts.map(([x, z], i) => (
-        <pointLight key={i} position={[x, data.top(x, z) + 35, z]} color="#ff7a30" intensity={(9000 + 3000 * Math.sin(t * 7 + i * 2.1) * Math.sin(t * 3.3 + i)) * 1} distance={900} decay={1.6} />
+        <pointLight key={i} position={[x, data.top(x, z) + 35, z]} color="#ff7a30" intensity={2200 + 700 * Math.sin(t * 7 + i * 2.1) * Math.sin(t * 3.3 + i)} distance={900} decay={1.6} />
       ))}
     </>
   );

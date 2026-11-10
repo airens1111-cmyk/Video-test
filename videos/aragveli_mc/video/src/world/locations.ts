@@ -52,7 +52,7 @@ export const LOCATIONS: Location[] = [
   { id: "a-geo", label: "Georgian line (reconstruction)", status: "Б", x: 2200, z: 1500, radius: 500, note: "Facing south-east, across the road from the south." },
   { id: "a-qaj", label: "Qajar army approach (reconstruction)", status: "Б", x: 3600, z: 4900, radius: 700, note: "From the south, along the Mtkvari right bank." },
   { id: "a-king", label: "Erekle II command position (reconstruction)", status: "Б", x: 1500, z: 700, radius: 200, note: "Rise behind the line; exact spot unknown." },
-  { id: "b", label: "(b) last stand — approaches & Mtkvari bank", status: "Б: by tradition", x: -3600, z: -3800, radius: 500,
+  { id: "b", label: "(b) last stand — approaches & Mtkvari bank", status: "Б: by tradition", x: -3400, z: -3550, radius: 500,
     note: "Approaches to the city near Ortachala/Metekhi; the 1959 memorial stands where remains of graves were found." },
   { id: "c", label: "(c) Tbilisi (Kala, Narikala, Metekhi)", status: "A (landmarks) / stylisation (houses)", x: -4600, z: -4400, radius: 700, note: "" },
   { id: "e", label: "(e) place of memory (symbolic)", status: "symbolic", x: -3753, z: -3894, radius: 150, note: "Terrace by the river at the memorial site, at dawn." },

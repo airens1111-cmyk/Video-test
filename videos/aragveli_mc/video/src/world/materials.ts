@@ -155,7 +155,7 @@ export function terrainMaterial() {
 }
 
 // ------------------------------------------------------------------ object textures (houses, walls, trees)
-export type ObjKind = "plaster" | "stone" | "tuff" | "roof" | "wood" | "leaves" | "trunk" | "tile";
+export type ObjKind = "plaster" | "stone" | "tuff" | "roof" | "wood" | "leaves" | "trunk" | "tile" | "grass";
 const OBJ_FRAG: Record<ObjKind, string> = {
   plaster: `
     vec3 N = normalize(vNormalW); vec2 tang = normalize(vec2(-N.z, N.x) + 1e-4);
@@ -202,6 +202,8 @@ const OBJ_FRAG: Record<ObjKind, string> = {
   trunk: `
     float n = hash12(floor(vec2(vWorld.x + vWorld.z, vWorld.y) * 3.));
     diffuseColor.rgb *= mix(vec3(.30,.22,.15), vec3(.40,.30,.20), n);`,
+  grass: `
+    diffuseColor.rgb *= vLeaf * (.9 + .2 * hash12(floor(vWorld.xz * 4.)));`,
   leaves: `
     vec3 q = floor(vWorld * 1.6); float n = hash13(q);
     vec3 c = vLeaf * (.75 + .4 * n);
@@ -210,14 +212,14 @@ const OBJ_FRAG: Record<ObjKind, string> = {
 };
 
 export function objectMaterial(kind: ObjKind, extra: { wind?: number } = {}) {
-  const leaf = kind === "leaves";
+  const leaf = kind === "leaves" || kind === "grass";
   return patch(new THREE.MeshLambertMaterial({ color: "#ffffff" }), {
     vertexPre: "attribute float aBurn; attribute float aSeed; varying float vBurn; varying float vSeed;\n" + (leaf ? "varying vec3 vLeaf;\n" : ""),
     vertexMain: "vBurn = aBurn; vSeed = aSeed;" + (leaf ? "\n#ifdef USE_INSTANCING_COLOR\n vLeaf = instanceColor;\n#else\n vLeaf = vec3(.4,.5,.2);\n#endif" : ""),
     fragPre: "varying float vBurn; varying float vSeed;\n" + (leaf ? "varying vec3 vLeaf;\n" : ""),
-    albedo: OBJ_FRAG[kind] + (leaf ? "" : ""),
+    albedo: OBJ_FRAG[kind],
     // windows of burning houses glow and flicker
-    emissive: kind === "plaster" ? `if (winF > .5) totalEmissiveRadiance += vec3(3.2, 1.3, .35) * vBurn * (.6 + .4 * sin(uTime * 13. + vSeed * 40.));` : "",
+    emissive: kind === "grass" ? "totalEmissiveRadiance += diffuseColor.rgb * .55 * (1. - uNight);" : leaf ? "totalEmissiveRadiance += diffuseColor.rgb * .18 * (1. - uNight);" : kind === "plaster" ? `if (winF > .5) totalEmissiveRadiance += vec3(3.0, 1.2, .3) * smoothstep(.55, 1., vBurn) * (.55 + .45 * sin(uTime * 13. + vSeed * 40.));` : "",
     wind: extra.wind,
   });
 }

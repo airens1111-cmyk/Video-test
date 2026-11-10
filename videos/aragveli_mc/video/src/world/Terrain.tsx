@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import { TerrainData } from "./data";
 import { terrainMaterial, waterMaterial } from "./materials";
-import { buildTile, QUAD, selectTiles, TileGeom } from "./terrain";
+import { buildTile, QUAD, selectTiles, TileGeom } from "./terrainGen";
 
 const TMAT = terrainMaterial();
 const WMAT = waterMaterial();

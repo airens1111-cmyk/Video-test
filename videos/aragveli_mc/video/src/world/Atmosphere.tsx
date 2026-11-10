@@ -65,14 +65,14 @@ export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vect
     // sun / moon with a shadow box that follows the focus point
     for (const [ref, dir, col, inten] of [[sun, sd, preset.sun.color, preset.sun.intensity], [moon, md, preset.moon?.color ?? "#000", preset.moon?.intensity ?? 0]] as const) {
       const l = ref.current; if (!l) continue;
-      l.color.set(col); l.intensity = inten * (dir.y > 0 ? Math.min(1, dir.y * 8 + 0.2) : 0);
+      l.color.set(col); l.intensity = 0.55 * inten * (dir.y > 0 ? Math.min(1, dir.y * 8 + 0.2) : 0);
       l.position.copy(focus).addScaledVector(dir, 3000);
       l.target.position.copy(focus); l.target.updateMatrixWorld();
       const cam = l.shadow.camera as THREE.OrthographicCamera;
       cam.left = -shadowSize; cam.right = shadowSize; cam.top = shadowSize; cam.bottom = -shadowSize; cam.near = 100; cam.far = 6000;
       cam.updateProjectionMatrix();
     }
-    const h = hemi.current!; h.color.set(preset.ambient.sky); h.groundColor.set(preset.ambient.ground); h.intensity = preset.ambient.intensity;
+    const h = hemi.current!; h.color.set(preset.ambient.sky); h.groundColor.set(preset.ambient.ground); h.intensity = 0.6 * preset.ambient.intensity;
   });
 
   return (

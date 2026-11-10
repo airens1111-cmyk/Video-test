@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { TerrainData } from "./data";
 import { objectMaterial, ObjKind } from "./materials";
-import { aragviSettlements, Box, city as buildCity, Kind, vegetation } from "./objects";
+import { aragviSettlements, Box, city as buildCity, Kind, vegetation } from "./placement";
 
 const cityCache = new WeakMap<TerrainData, ReturnType<typeof buildCity>>();
 const city = (d: TerrainData) => { if (!cityCache.has(d)) cityCache.set(d, buildCity(d)); return cityCache.get(d)!; };
@@ -12,7 +12,7 @@ const MATS = new Map<string, THREE.Material>();
 const matFor = (k: Kind) => {
   if (!MATS.has(k)) {
     const map: Record<Kind, [ObjKind, number?]> = {
-      trunk: ["trunk"], leaves: ["leaves", 0.35], vine: ["leaves", 0.12], grass: ["leaves", 0.25], plaster: ["plaster"],
+      trunk: ["trunk"], leaves: ["leaves", 0.35], vine: ["leaves", 0.12], grass: ["grass", 0.25], plaster: ["plaster"],
       roof: ["roof"], stone: ["stone"], tuff: ["tuff"], tile: ["tile"], wood: ["wood"],
     };
     const [kind, wind] = map[k];
@@ -88,9 +88,19 @@ export const Vegetation: React.FC<{ data: TerrainData; cam: THREE.Vector3; radiu
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, gk, grass, cam.y > data.surface(cam.x, cam.z) + 60]);
+  // keep the lens clear: nothing taller than grass within 8 m of a ground-level camera
+  const lowCam = cam.y - data.surface(cam.x, cam.z) < 20;
+  const ck = lowCam ? `${Math.round(cam.x / 2)}:${Math.round(cam.z / 2)}` : "high";
+  const clear = useMemo(() => {
+    if (!lowCam) return sets;
+    const out = {} as Record<Kind, Box[]>;
+    for (const k of KINDS) out[k] = sets[k].filter((b) => Math.hypot(b.x - cam.x, b.z - cam.z) > 8 + Math.max(b.sx, b.sz) / 2);
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sets, ck]);
   return (
     <>
-      {KINDS.filter((k) => k !== "grass").map((k) => <Boxes key={k + key} kind={k} boxes={sets[k]} shadows={k !== "vine"} />)}
+      {KINDS.filter((k) => k !== "grass").map((k) => <Boxes key={k + key} kind={k} boxes={clear[k]} shadows={k !== "vine"} />)}
       <Boxes key={"grass" + gk} kind="grass" boxes={grassBoxes} shadows={false} />
     </>
   );
@@ -109,7 +119,8 @@ function vegCache(d: TerrainData, ox: number, oz: number, size: number, vines: b
 /** Old Tbilisi, intact or burning (burn in 0..1 spreads through the city by house seed). */
 export const City: React.FC<{ data: TerrainData; burn: number }> = ({ data, burn }) => {
   const c = useMemo(() => city(data), [data]);
-  const f = (b: Box) => Math.max(0, Math.min(1, burn * 1.8 - ((b.seed ?? 0) % 1) * 0.8));
+  // ~45% of houses burn (by seed); the rest are scorched by smoke only
+  const f = (b: Box) => { const s = ((b.seed ?? 0) * 7.13) % 1; return s < 0.45 ? Math.min(1, burn * 1.6 - s) : Math.min(0.35, burn * 0.35); };
   return (
     <>
       {KINDS.map((k) => <Boxes key={k} kind={k} boxes={c[k]} burn={k === "plaster" || k === "roof" || k === "wood" || k === "stone" || k === "tile" ? f : undefined} />)}
@@ -125,5 +136,5 @@ export const AragviSettlements: React.FC<{ data: TerrainData }> = ({ data }) => 
 /** Burning-house anchor points (roof centres) for fire/smoke emitters. */
 export function burningHouses(data: TerrainData, burn: number, max = 160) {
   const c = city(data);
-  return c.roof.filter((b) => ((b.seed ?? 0) % 1) * 0.8 < burn * 1.8 - 0.3).slice(0, max).map((b) => new THREE.Vector3(b.x, b.y, b.z));
+  return c.roof.filter((b) => (((b.seed ?? 0) * 7.13) % 1) < 0.45 * burn).slice(0, max).map((b) => new THREE.Vector3(b.x, b.y, b.z));
 }

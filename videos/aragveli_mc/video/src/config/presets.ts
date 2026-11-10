@@ -8,13 +8,13 @@ export interface Grade {
 /** Colour grading per act (applied in the final post pass). */
 export const GRADES: Record<string, Grade> = {
   // Act I — context, before the battle: cold blue-grey
-  cold: { lift: [0.0, 0.01, 0.03], gamma: [1.0, 1.0, 1.04], gain: [0.94, 0.98, 1.05], saturation: 0.78, contrast: 1.06, temperature: -0.35 },
+  cold: { lift: [0.0, 0.01, 0.03], gamma: [1.0, 1.0, 1.04], gain: [0.94, 0.98, 1.05], saturation: 0.9, contrast: 1.06, temperature: -0.35 },
   // Act II — the battle: dusty ochre
   ochre: { lift: [0.03, 0.02, 0.0], gamma: [1.02, 1.0, 0.95], gain: [1.06, 1.0, 0.86], saturation: 0.88, contrast: 1.1, temperature: 0.35 },
   // Act III — the turning point: drained and contrasty
   drained: { lift: [0.0, 0.0, 0.0], gamma: [1.0, 1.0, 1.0], gain: [1.0, 0.99, 0.97], saturation: 0.45, contrast: 1.25, temperature: 0.0 },
   // Act IV — last stand / sunset: crimson
-  crimson: { lift: [0.04, 0.0, 0.01], gamma: [0.98, 1.03, 1.04], gain: [1.12, 0.9, 0.82], saturation: 0.95, contrast: 1.15, temperature: 0.45 },
+  crimson: { lift: [0.03, 0.0, 0.01], gamma: [0.98, 1.01, 1.02], gain: [1.06, 0.95, 0.9], saturation: 0.9, contrast: 1.15, temperature: 0.45 },
   // Act V — memory / final dawn: soft gold
   gold: { lift: [0.02, 0.015, 0.01], gamma: [0.98, 1.0, 1.03], gain: [1.06, 1.01, 0.9], saturation: 0.85, contrast: 0.98, temperature: 0.25 },
   neutral: { lift: [0, 0, 0], gamma: [1, 1, 1], gain: [1, 1, 1], saturation: 1, contrast: 1, temperature: 0 },
@@ -47,7 +47,7 @@ export const PRESETS: Record<string, Preset> = {
     fog: { color: "#9aa6b8", sunColor: "#ffc08e", density: 0.00040, falloff: 0.012, base: 0, haze: 0.000025 },
     godRays: 0.8, clouds: { cover: 0.25, color: "#ffd0b0", altitude: 1400, speed: 2, dark: 0.15 },
     wind: { dir: 120, strength: 0.25 }, particles: { windDust: 0.2, ash: 0, riverMist: 1, embers: 0, heat: 0 },
-    exposure: 1.0, bloom: { threshold: 1.0, strength: 0.6, radius: 0.7 }, streak: 0.35, vignette: 0.45, grain: 0.05, chroma: 0.0015,
+    exposure: 1.35, bloom: { threshold: 1.0, strength: 0.6, radius: 0.7 }, streak: 0.35, vignette: 0.45, grain: 0.05, chroma: 0.0015,
     grade: "cold", night: 0.1,
   },
   overcast: {
@@ -55,7 +55,7 @@ export const PRESETS: Record<string, Preset> = {
     sun: { elevation: 32, azimuth: 160, color: "#d8dde4", intensity: 1.0 },
     ambient: { sky: "#aab6c4", ground: "#5d574c", intensity: 1.15 },
     sky: { zenith: "#7c8896", horizon: "#c3c7c8", sunGlow: 0.2, stars: 0 },
-    fog: { color: "#a9afb4", sunColor: "#c9ccce", density: 0.00028, falloff: 0.006, base: 0, haze: 0.000040 },
+    fog: { color: "#a9afb4", sunColor: "#c9ccce", density: 0.00016, falloff: 0.006, base: 0, haze: 0.000022 },
     godRays: 0.0, clouds: { cover: 0.85, color: "#9aa2aa", altitude: 1100, speed: 4, dark: 0.5 },
     wind: { dir: 100, strength: 0.7 }, particles: { windDust: 0.4, ash: 0, riverMist: 0.4, embers: 0, heat: 0 },
     exposure: 1.0, bloom: { threshold: 1.2, strength: 0.25, radius: 0.6 }, streak: 0.0, vignette: 0.5, grain: 0.06, chroma: 0.001,
@@ -74,13 +74,13 @@ export const PRESETS: Record<string, Preset> = {
   },
   crimsonSunset: {
     name: "Crimson sunset",
-    sun: { elevation: 3, azimuth: 262, color: "#ff6a3a", intensity: 2.4 },
-    ambient: { sky: "#8a6070", ground: "#3a2622", intensity: 0.6 },
-    sky: { zenith: "#3a2a4a", horizon: "#ff7a45", sunGlow: 2.0, stars: 0.05 },
-    fog: { color: "#a0645a", sunColor: "#ff7a40", density: 0.00045, falloff: 0.014, base: 0, haze: 0.000045 },
-    godRays: 1.1, clouds: { cover: 0.4, color: "#ff8a5a", altitude: 1500, speed: 2, dark: 0.35 },
+    sun: { elevation: 4, azimuth: 262, color: "#ff8f55", intensity: 2.4 },
+    ambient: { sky: "#a07484", ground: "#4a3028", intensity: 1.0 },
+    sky: { zenith: "#3a3456", horizon: "#ff8a55", sunGlow: 1.6, stars: 0.05 },
+    fog: { color: "#9a7468", sunColor: "#ff8a50", density: 0.00045, falloff: 0.014, base: 0, haze: 0.000045 },
+    godRays: 1.1, clouds: { cover: 0.3, color: "#ff8a5a", altitude: 2200, speed: 2, dark: 0.35 },
     wind: { dir: 80, strength: 0.6 }, particles: { windDust: 0.9, ash: 0.3, riverMist: 0.2, embers: 0.2, heat: 0.2 },
-    exposure: 1.05, bloom: { threshold: 0.9, strength: 0.8, radius: 0.8 }, streak: 0.5, vignette: 0.6, grain: 0.07, chroma: 0.0025,
+    exposure: 1.25, bloom: { threshold: 0.9, strength: 0.8, radius: 0.8 }, streak: 0.5, vignette: 0.55, grain: 0.07, chroma: 0.0025,
     grade: "crimson", night: 0.2,
   },
   night: {

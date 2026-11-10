@@ -2,7 +2,7 @@
 import * as THREE from "three";
 import { BLOCK, TerrainData } from "./data";
 import { ARAGVI, distToPolyline, ISANI, KALA, NARIKALA_WALL, P2, pointInPoly, TB } from "./locations";
-import { landUse, T_BANK, T_DRY, T_FARM, T_FOREST, T_ORCHARD, T_PASTURE, T_VINE, T_ALPINE, T_ROCK } from "./terrain";
+import { landUse, T_BANK, T_DRY, T_FARM, T_FOREST, T_ORCHARD, T_PASTURE, T_VINE, T_ALPINE, T_ROCK } from "./terrainGen";
 
 export type Box = { x: number; y: number; z: number; sx: number; sy: number; sz: number; ry?: number; color?: THREE.Color; seed?: number; burn?: number };
 export type Kind = "trunk" | "leaves" | "plaster" | "roof" | "stone" | "tuff" | "tile" | "wood" | "vine" | "grass";
@@ -11,7 +11,7 @@ const h2 = (a: number, b: number) => { const s = Math.sin(a * 127.1 + b * 311.7)
 
 const LEAF = ["#5d7a35", "#6b8638", "#55702f", "#76883a", "#8a8c38", "#a59a3a", "#b8a03a", "#6f7d33"].map((c) => new THREE.Color(c));
 const POPLAR = ["#7d8f3c", "#93983c", "#a8a03c", "#6d8436"].map((c) => new THREE.Color(c));
-const GRASS = ["#c8ac5c", "#b89a50", "#d4b868", "#a89448", "#9aa050"].map((c) => new THREE.Color(c));
+const GRASS = ["#e0c070", "#d0b060", "#ecd080", "#c8b058", "#b8b860"].map((c) => new THREE.Color(c));
 
 /** Vegetation inside one square area (cached by key). ground(x,z) gives the block top. */
 export function vegetation(d: TerrainData, ox: number, oz: number, size: number, detail: { grass: boolean; vines: boolean }) {
@@ -45,10 +45,10 @@ export function vegetation(d: TerrainData, ox: number, oz: number, size: number,
       }
     }
     if (detail.grass && (t === T_DRY || t === T_PASTURE || t === T_FARM || t === T_ORCHARD || t === T_ALPINE)) {
-      for (let k = 0; k < 7; k++) {
+      for (let k = 0; k < 14; k++) {
         const a = h2(cx + k * 13.1, cz - k * 7.7), b = h2(cz + k * 3.3, cx + k * 9.1);
-        const hh = 0.35 + a * 0.6;
-        out.grass.push({ x: x + a * BLOCK, y: y + hh / 2, z: z + b * BLOCK, sx: 0.12, sy: hh, sz: 0.12, color: GRASS[Math.floor(b * 5)] });
+        const hh = 0.18 + a * a * 0.5;
+        out.grass.push({ x: x + a * BLOCK, y: y + hh / 2, z: z + b * BLOCK, sx: 0.07, sy: hh, sz: 0.07, ry: a * 3, color: GRASS[Math.floor(b * 5)] });
       }
     }
   }
@@ -86,7 +86,9 @@ export function city(d: TerrainData) {
     for (let z = Math.min(...zs); z < Math.max(...zs); z += 10.5) for (let x = Math.min(...xs); x < Math.max(...xs); x += 10.5) {
       const r = h2(x * 0.11, z * 0.17), r2 = h2(z * 0.07, x * 0.19);
       const cx = x + (r - 0.5) * 3, cz = z + (r2 - 0.5) * 3;
-      if (!pointInPoly(cx, cz, poly) || !free(cx, cz) || r < 0.08) continue;
+      if (!pointInPoly(cx, cz, poly) || !free(cx, cz) || r < 0.22) continue;
+      const gx = Math.round(x / 10.5), gz = Math.round(z / 10.5);
+      if (gx % 5 === 0 || gz % 4 === 0) continue;                               // lanes between blocks
       if (d.slope(cx, cz) > 1.6) continue;
       const w = 6 + r * 3.5, dd = 6 + r2 * 3.5, floors = 1 + Math.floor(h2(cx, cz) * 2.6), hh = floors * 3.1;
       const y = Math.min(g(cx - w / 2, cz), g(cx + w / 2, cz), g(cx, cz - dd / 2), g(cx, cz + dd / 2));

@@ -2,3 +2,7 @@ node_modules/
 __pycache__/
 video/out/
 samples/music/*.wav
+data/raw/*.hgt
+data/raw/*.hgt.gz
+data/raw/water.json
+video/out/

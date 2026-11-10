@@ -6,3 +6,4 @@ data/raw/*.hgt
 data/raw/*.hgt.gz
 data/raw/water.json
 video/out/
+stage1/*.log

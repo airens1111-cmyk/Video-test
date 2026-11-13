@@ -1,0 +1,13 @@
+{
+  "id": "P099",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "At our table we already make toasts all night, nobody needs cards for that. As a last-minute gift it's cute, but 45 lari is a lot for something my friends would play once and laugh at.",
+  "objection": "Мы и так говорим тосты, зачем для этого игра — it feels like paying for something we do for free, and I'm not sure it stays fun after the first round.",
+  "would_change_my_mind": "If it were around 25-30 lari and I saw a funny Instagram video of friends actually playing it right before a birthday, with delivery the next day, I'd grab it as a gift.",
+  "price_too_cheap": 10,
+  "price_cheap": 20,
+  "price_expensive": 35,
+  "price_too_expensive": 50
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I never buy a game I haven't seen played, and here there's no video, no reviews, just a description and a box. On top of that, 45 lari for a deck of cards feels steep for a gift when I haven't played anything in over a year myself.",
+  "objection": "I have no idea whether it's actually fun or just awkward: what if people freeze up for those 30 seconds and the whole evening falls flat? Without seeing real people play it, I'm not paying 45 lari.",
+  "would_change_my_mind": "A video of a real group playing it and laughing, plus a few honest reviews, and ideally a price closer to 30 lari.",
+  "price_too_cheap": 12,
+  "price_cheap": 25,
+  "price_expensive": 38,
+  "price_too_expensive": 50
+}

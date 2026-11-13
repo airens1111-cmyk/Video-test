@@ -9,8 +9,8 @@
 | IPP | 30.09 ₾ | as many call it a bargain as call it expensive |
 | PME | 49.94 ₾ | above this, too many say it is too expensive to buy |
 
-**Acceptable range: 15.27 ₾ to 49.94. ₾**
+**Acceptable range: 15.27 ₾ to 49.94 ₾.**
 
-Median answers: too cheap 15.00, ₾ a bargain 25.00, ₾ getting expensive 40.00, ₾ too expensive 60.00. ₾
+Median answers: too cheap 15.00 ₾, a bargain 25.00 ₾, getting expensive 40.00 ₾, too expensive 60.00 ₾.
 
-Your current price, 45.00, ₾ is **inside** the acceptable range.
+Your current price, 45.00 ₾, is **inside** the acceptable range.

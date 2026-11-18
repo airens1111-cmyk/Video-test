@@ -107,6 +107,17 @@ export const PRESETS: Record<string, Preset> = {
     exposure: 1.2, bloom: { threshold: 0.75, strength: 1.0, radius: 0.85 }, streak: 0.6, vignette: 0.6, grain: 0.09, chroma: 0.0025,
     grade: "crimson", night: 1,
   },
+  goldenHour: {
+    name: "Golden hour (film-set proof)",
+    sun: { elevation: 13, azimuth: 248, color: "#ffc98a", intensity: 3.4 },
+    ambient: { sky: "#9fb6d8", ground: "#6a5236", intensity: 1.0 },
+    sky: { zenith: "#3f6fb8", horizon: "#f0c890", sunGlow: 1.4, stars: 0 },
+    fog: { color: "#cdb994", sunColor: "#ffcf90", density: 0.0005, falloff: 0.02, base: 0, haze: 0.00004 },
+    godRays: 0.7, clouds: { cover: 0.22, color: "#fff1dc", altitude: 1600, speed: 2, dark: 0.05 },
+    wind: { dir: 80, strength: 0.4 }, particles: { windDust: 0.35, ash: 0, riverMist: 0, embers: 0, heat: 0 },
+    exposure: 1.0, bloom: { threshold: 1.0, strength: 0.55, radius: 0.8 }, streak: 0.25, vignette: 0.5, grain: 0.04, chroma: 0.0008,
+    grade: "neutral", night: 0,
+  },
   finalDawn: {
     name: "Final dawn",
     sun: { elevation: 7, azimuth: 96, color: "#ffd59a", intensity: 2.4 },

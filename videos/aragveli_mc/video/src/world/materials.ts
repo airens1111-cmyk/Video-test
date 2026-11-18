@@ -117,7 +117,7 @@ vec3 terrainAlbedo(float t, float topY){
 }
 `;
 
-function patch(mat: THREE.Material, opts: { vertexPre?: string; vertexMain?: string; fragPre?: string; albedo?: string; emissive?: string; alpha?: boolean; noFog?: boolean; wind?: number }) {
+export function patch(mat: THREE.Material, opts: { vertexPre?: string; vertexMain?: string; fragPre?: string; albedo?: string; emissive?: string; alpha?: boolean; noFog?: boolean; wind?: number }) {
   mat.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, U);
     shader.vertexShader = COMMON + (opts.vertexPre ?? "") + (opts.alpha ? "attribute float aAlpha; varying float vAlpha;\n" : "") + shader.vertexShader

@@ -2,6 +2,8 @@ import React from "react";
 import { Composition } from "remotion";
 import { FLYOVERS, STILLS } from "./camera/shots";
 import { BattleTest } from "./scenes/BattleTest";
+import { SetProof as SP } from "./scenes/SetProof";
+const SetProof = SP as unknown as React.FC<Record<string, unknown>>;
 import { WorldShot as WS } from "./scenes/WorldShot";
 const WorldShot = WS as unknown as React.FC<Record<string, unknown>>;
 
@@ -24,6 +26,9 @@ export const Root: React.FC = () => (
     {STILLS.map((s) => (
       <Composition key={s.id} id={`Still-${s.id}`} component={WorldShot} durationInFrames={1} {...MASTER}
         defaultProps={{ region: s.region, preset: s.preset, move: s.move, burn: s.burn, dustRoad: s.dustRoad, quality: "final" as const, letterbox: 2.39, tOffset: s.t }} />
+    ))}
+    {(["medium", "wide", "low"] as const).map((shot) => (
+      <Composition key={shot} id={`Proof-${shot}`} component={SetProof} durationInFrames={1} {...MASTER} defaultProps={{ shot }} />
     ))}
     <Composition id="BattleTest" component={BattleTest} durationInFrames={300} fps={30} width={1080} height={1920} />
   </>

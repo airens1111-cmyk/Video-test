@@ -58,9 +58,13 @@ const SIDES = [
 
 const cache = new Map<string, TileGeom>();
 
+/** Rectangle cut out of the LOD terrain where a 1 m film set is placed (null = none). */
+export const HOLE: { r: { x0: number; z0: number; x1: number; z1: number } | null } = { r: null };
+export const inHole = (x: number, z: number, m = 0) => { const r = HOLE.r; return !!r && x > r.x0 - m && x < r.x1 + m && z > r.z0 - m && z < r.z1 + m; };
+
 /** Builds one tile: level L has columns of size BLOCK*2^L, TILE_CELLS^2 columns. ox, oz = tile min corner. */
 export function buildTile(d: TerrainData, L: number, ox: number, oz: number): TileGeom {
-  const key = `${d.meta.name}:${L}:${ox}:${oz}`;
+  const key = `${d.meta.name}:${L}:${ox}:${oz}:${HOLE.r ? Object.values(HOLE.r).join(",") : ""}`;
   const hit = cache.get(key); if (hit) return hit;
   const c = BLOCK * 2 ** L, N = TILE_CELLS;
   const H = new Float32Array((N + 2) * (N + 2));
@@ -76,7 +80,7 @@ export function buildTile(d: TerrainData, L: number, ox: number, oz: number): Ti
   const skirt = L > 0 ? c * 1.5 : BLOCK * 2;
   for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
     const x = ox + (j + 0.5) * c, z = oz + (i + 0.5) * c;
-    if (!d.inside(x, z)) continue;
+    if (!d.inside(x, z) || inHole(x, z, -c / 2)) continue;
     const T = top(i, j);
     const type = landUse(d, x, z);
     push(_p.set(x, T, z), UP, c, c, type, T);

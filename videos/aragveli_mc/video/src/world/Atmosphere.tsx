@@ -31,7 +31,7 @@ void main(){
   gl_FragColor = vec4(col, 1.);
 }`;
 
-export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vector3; fogBase?: number; shadowSize?: number; cloudArea?: number; shadowRes?: number }> = ({ preset, t, focus, fogBase = 0, shadowSize = 600, cloudArea = 16000, shadowRes = 2048 }) => {
+export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vector3; fogBase?: number; shadowSize?: number; cloudArea?: number; shadowRes?: number; shadowSoft?: number }> = ({ preset, t, focus, fogBase = 0, shadowSize = 600, cloudArea = 16000, shadowRes = 2048, shadowSoft = 1 }) => {
   const { scene } = useThree();
   const sun = useRef<THREE.DirectionalLight>(null);
   const moon = useRef<THREE.DirectionalLight>(null);
@@ -71,6 +71,7 @@ export const Atmosphere: React.FC<{ preset: Preset; t: number; focus: THREE.Vect
       const cam = l.shadow.camera as THREE.OrthographicCamera;
       cam.left = -shadowSize; cam.right = shadowSize; cam.top = shadowSize; cam.bottom = -shadowSize; cam.near = 100; cam.far = 6000;
       cam.updateProjectionMatrix();
+      l.shadow.radius = shadowSoft; l.shadow.blurSamples = 12;
     }
     const h = hemi.current!; h.color.set(preset.ambient.sky); h.groundColor.set(preset.ambient.ground); h.intensity = 0.6 * preset.ambient.intensity;
   });

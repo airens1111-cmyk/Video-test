@@ -17,6 +17,7 @@ export const GRADES: Record<string, Grade> = {
   crimson: { lift: [0.03, 0.0, 0.01], gamma: [0.98, 1.01, 1.02], gain: [1.06, 0.95, 0.9], saturation: 0.9, contrast: 1.15, temperature: 0.45 },
   // Act V — memory / final dawn: soft gold
   gold: { lift: [0.02, 0.015, 0.01], gamma: [0.98, 1.0, 1.03], gain: [1.06, 1.01, 0.9], saturation: 0.85, contrast: 0.98, temperature: 0.25 },
+  film: { lift: [0.0, 0.005, 0.012], gamma: [0.97, 0.97, 0.97], gain: [1.0, 1.0, 1.01], saturation: 1.12, contrast: 1.14, temperature: -0.05 },
   neutral: { lift: [0, 0, 0], gamma: [1, 1, 1], gain: [1, 1, 1], saturation: 1, contrast: 1, temperature: 0 },
 };
 
@@ -106,6 +107,17 @@ export const PRESETS: Record<string, Preset> = {
     wind: { dir: 60, strength: 0.8 }, particles: { windDust: 0, ash: 1.5, riverMist: 0.2, embers: 1.5, heat: 1 },
     exposure: 1.2, bloom: { threshold: 0.75, strength: 1.0, radius: 0.85 }, streak: 0.6, vignette: 0.6, grain: 0.09, chroma: 0.0025,
     grade: "crimson", night: 1,
+  },
+  filmDay: {
+    name: "Soft hazy day (reference look)",
+    sun: { elevation: 38, azimuth: 215, color: "#fff2df", intensity: 2.0 },
+    ambient: { sky: "#d6dee6", ground: "#7a6e5a", intensity: 1.55 },
+    sky: { zenith: "#b4c2cf", horizon: "#e8eaea", sunGlow: 0.5, stars: 0 },
+    fog: { color: "#d0d6da", sunColor: "#e9e4da", density: 0.0014, falloff: 0.006, base: 0, haze: 0.00045 },
+    godRays: 0.25, clouds: { cover: 0.0, color: "#ffffff", altitude: 1600, speed: 1, dark: 0 },
+    wind: { dir: 80, strength: 0.4 }, particles: { windDust: 0.15, ash: 0, riverMist: 0, embers: 0, heat: 0 },
+    exposure: 1.05, bloom: { threshold: 1.1, strength: 0.35, radius: 0.8 }, streak: 0.1, vignette: 0.38, grain: 0.03, chroma: 0.0006,
+    grade: "film", night: 0,
   },
   goldenHour: {
     name: "Golden hour (film-set proof)",

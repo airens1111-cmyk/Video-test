@@ -5,7 +5,7 @@ import { TerrainData } from "../world/data";
 import { distToPolyline, ROADS } from "../world/locations";
 import { TileName, uvRect } from "./atlas";
 
-export const AIR = 0, GRASS = 1, DIRT = 2, STONE = 3, PATH = 4, COARSE = 5, STUBBLE = 6, GRAVEL = 7, CLAY = 8, LOG = 9, LEAVES = 10;
+export const AIR = 0, GRASS = 1, DIRT = 2, STONE = 3, PATH = 4, COARSE = 5, STUBBLE = 6, GRAVEL = 7, CLAY = 8, LOG = 9, LEAVES = 10, COBBLE = 11;
 
 const hash = (a: number, b: number, c = 0) => { const s = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return s - Math.floor(s); };
 function vnoise(x: number, z: number, seed = 0) {
@@ -33,8 +33,7 @@ export class VoxelSet {
   h(x: number, z: number) { x = Math.max(0, Math.min(this.S - 1, x)); z = Math.max(0, Math.min(this.S - 1, z)); return this.H[this.idx(x, z)]; }
   solid(x: number, y: number, z: number) {
     if (y < this.h(x, z)) return true;
-    const t = this.sparse.get(this.key(x, y, z));
-    return t === LOG || t === LEAVES;
+    return this.sparse.has(this.key(x, y, z));
   }
   /** World y (m) of the ground top at world x,z (for cameras). */
   groundY(wx: number, wz: number) { return this.baseY + this.h(Math.floor(wx - this.x0), Math.floor(wz - this.z0)); }
@@ -43,9 +42,16 @@ export class VoxelSet {
     const { S, d, x0, z0 } = this;
     for (let z = 0; z < S; z++) for (let x = 0; x < S; x++) {
       const wx = x0 + x + 0.5, wz = z0 + z + 0.5;
-      const micro = (vnoise(wx / 23, wz / 23, 1) - 0.5) * 2.4 + (vnoise(wx / 7, wz / 7, 2) - 0.5) * 0.9;
+      const micro = (vnoise(wx / 38, wz / 38, 1) - 0.5) * 3.2 + (vnoise(wx / 17, wz / 17, 2) - 0.5) * 1.0;
       this.H[this.idx(x, z)] = Math.round(d.surface(wx, wz) - this.baseY + micro);
     }
+    const Hm = new Int16Array(this.H);                       // 3x3 median: no lone 1-block bumps or pits
+    for (let z = 1; z < S - 1; z++) for (let x = 1; x < S - 1; x++) {
+      const v: number[] = [];
+      for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) v.push(this.H[this.idx(x + dx, z + dz)]);
+      v.sort((a, b) => a - b); Hm[this.idx(x, z)] = v[4];
+    }
+    this.H = Hm;
     for (let z = 0; z < S; z++) for (let x = 0; x < S; x++) {
       const wx = x0 + x + 0.5, wz = z0 + z + 0.5, h = this.h(x, z);
       const steep = Math.max(Math.abs(h - this.h(x + 1, z)), Math.abs(h - this.h(x - 1, z)), Math.abs(h - this.h(x, z + 1)), Math.abs(h - this.h(x, z - 1)));
@@ -58,50 +64,80 @@ export class VoxelSet {
       else if (steep >= 3) t = hash(x, z, 4) < 0.6 ? CLAY : STONE;
       else if (steep === 2 && hash(x, z, 6) < 0.35) t = COARSE;
       else if (parcel < 0.42 && vnoise(wx / 90, wz / 90, 9) > 0.35) t = STUBBLE;
-      else if (hash(x, z, 7) < 0.015) t = GRAVEL;
+      else if (vnoise(wx / 9, wz / 9, 31) > 0.86 && hash(x, z, 34) < 0.7) t = COARSE;                       // worn, trampled patches
+      else if (hash(x, z, 7) < 0.02) t = GRAVEL;
       this.top[this.idx(x, z)] = t;
       // sprites on grass
       if (t === GRASS) {
         const r = hash(x, z, 8);
-        if (r < 0.16 + 0.14 * vnoise((x0 + x) / 15, (z0 + z) / 15, 21)) this.sprites.push({ x: x + 0.5, y: h, z: z + 0.5, tile: "tallGrass", s: 0.7 + hash(x, z, 9) * 0.45 });
+        if (r < 0.06 + 0.16 * vnoise((x0 + x) / 15, (z0 + z) / 15, 21)) this.sprites.push({ x: x + 0.5, y: h, z: z + 0.5, tile: "tallGrass", s: 0.5 + hash(x, z, 9) * 0.45 });
         else if (r > 0.985) this.sprites.push({ x: x + 0.5, y: h, z: z + 0.5, tile: hash(x, z, 10) < 0.5 ? "flowerRed" : "flowerYellow", s: 0.8 });
       }
     }
-    // trees: groves from low-frequency noise, never on roads or fields
-    for (let z = 3; z < S - 3; z += 4) for (let x = 3; x < S - 3; x += 4) {
-      const jx = x + Math.floor(hash(x, z, 11) * 4) - 2, jz = z + Math.floor(hash(x, z, 12) * 4) - 2;
+    // vegetation: oak groves, lone big oaks, poplar lines along the road, bushes, boulders
+    const clear = (wx: number, wz: number, extra = 0) => (this.spec.clear ?? []).some(([cx, cz, r]) => Math.hypot(wx - cx, wz - cz) < r + extra);
+    for (let z = 6; z < S - 6; z += 5) for (let x = 6; x < S - 6; x += 5) {
+      const jx = x + Math.floor(hash(x, z, 11) * 5) - 2, jz = z + Math.floor(hash(x, z, 12) * 5) - 2;
+      const wx = x0 + jx, wz = z0 + jz;
       const t = this.top[this.idx(jx, jz)];
       if (t !== GRASS && t !== COARSE) continue;
-      const g = vnoise((x0 + jx) / 90, (z0 + jz) / 90, 13);
-      const p = g > 0.74 ? 0.7 : g > 0.66 ? 0.15 : 0.012;
-      if ((this.spec.clear ?? []).some(([cx, cz, r]) => Math.hypot(x0 + jx - cx, z0 + jz - cz) < r)) continue;
-      if (hash(jx, jz, 14) < p) this.tree(jx, jz, 4 + Math.floor(hash(jx, jz, 15) * 3), 2.2 + hash(jx, jz, 16) * 1.3);
+      const g = vnoise(wx / 90, wz / 90, 13), r = hash(jx, jz, 14);
+      let road = Infinity; for (const rd of ROADS) road = Math.min(road, distToPolyline(wx, wz, rd));
+      if (road > 4 && road < 7 && r < 0.55 && !clear(wx, wz)) { this.poplar(jx, jz); continue; }
+      if (clear(wx, wz)) continue;
+      if (g > 0.72 && r < 0.6) this.oak(jx, jz, 6 + Math.floor(hash(jx, jz, 15) * 4), 1);
+      else if (g > 0.6 && r < 0.12) this.oak(jx, jz, 6 + Math.floor(hash(jx, jz, 15) * 3), 1);
+      else if (r < 0.01) this.oak(jx, jz, 8, 1.2);
+      else if (r > 0.96) this.bush(jx, jz);
+      else if (r > 0.94 && r <= 0.96) this.boulder(jx, jz);
     }
-    for (const [hx, hz] of this.spec.hero ?? []) this.tree(Math.round(hx - x0), Math.round(hz - z0), 7, 4.6, true);
+    for (const [hx, hz] of this.spec.hero ?? []) this.oak(Math.round(hx - x0), Math.round(hz - z0), 10, 1.6, true);
   }
 
-  tree(x: number, z: number, trunk: number, R: number, hero = false) {
-    if (x < 4 || z < 4 || x > this.S - 5 || z > this.S - 5) return;
-    const y0 = this.h(x, z);
-    for (let y = 0; y < trunk; y++) this.sparse.set(this.key(x, y0 + y, z), LOG);
-    if (hero) {                                              // thick trunk and branches
-      for (const [dx, dz] of [[1, 0], [0, 1], [1, 1]]) for (let y = 0; y < trunk - 2; y++) this.sparse.set(this.key(x + dx, y0 + y, z + dz), LOG);
-      for (const [dx, dz] of [[2, 0], [-1, 1], [1, -1], [0, 2]]) this.sparse.set(this.key(x + dx, y0 + trunk - 2, z + dz), LOG);
-    }
-    const cy = y0 + trunk + (hero ? 0 : -0.5);
+  private set(x: number, y: number, z: number, t: number, overwrite = false) { const k = this.key(x, y, z); if (overwrite || !this.sparse.has(k)) this.sparse.set(k, t); }
+  private blob(cx: number, cy: number, cz: number, R: number, Ry = R * 0.7, seed = 0) {
     const r = Math.ceil(R) + 1;
     for (let dy = -r; dy <= r; dy++) for (let dz = -r; dz <= r; dz++) for (let dx = -r; dx <= r; dx++) {
-      const e = (dx * dx) / (R * R) + (dy * dy) / (R * R * 0.55) + (dz * dz) / (R * R);
-      const n = hash(x + dx * 3.1, z + dz * 1.7, dy + 20) * 0.45;
-      if (e + n < 1.08) {
-        const k = this.key(x + dx, Math.round(cy + dy), z + dz);
-        if (!this.sparse.has(k)) this.sparse.set(k, LEAVES);
-      }
+      const e = (dx * dx + dz * dz) / (R * R) + (dy * dy) / (Ry * Ry);
+      if (e + hash(cx + dx * 3.1, cz + dz * 1.7, cy + dy + seed) * 0.6 < 1.15) this.set(Math.round(cx + dx), Math.round(cy + dy), Math.round(cz + dz), LEAVES);
     }
-    // ferns around the foot
-    for (let k = 0; k < 6; k++) {
-      const fx = x + Math.round((hash(x, z, 30 + k) - 0.5) * 6), fz = z + Math.round((hash(z, x, 40 + k) - 0.5) * 6);
+  }
+  oak(x: number, z: number, trunk: number, scale: number, hero = false) {
+    if (x < 8 || z < 8 || x > this.S - 9 || z > this.S - 9) return;
+    const y0 = this.h(x, z);
+    const thick = hero ? [[0, 0], [1, 0], [0, 1], [1, 1]] : [[0, 0]];
+    for (let y = -1; y < trunk; y++) for (const [dx, dz] of thick) this.set(x + dx, y0 + y, z + dz, LOG, true);
+    // branches reaching out and up, each carrying a leaf cloud
+    const nb = hero ? 5 : 3 + Math.floor(hash(x, z, 60) * 2);
+    for (let b = 0; b < nb; b++) {
+      const a = (b / nb) * Math.PI * 2 + hash(x, z, 61 + b) * 1.2;
+      const len = (2 + hash(x, z, 70 + b) * 2.5) * scale, by = y0 + trunk - 2 - Math.floor(hash(x, z, 80 + b) * 3);
+      let px = x, py = by, pz = z;
+      for (let s = 1; s <= len; s++) { px = Math.round(x + Math.cos(a) * s); pz = Math.round(z + Math.sin(a) * s); py = by + Math.floor(s * 0.6); this.set(px, py, pz, LOG, true); }
+      this.blob(px, py + 1.5, pz, (2.2 + hash(x, z, 90 + b) * 1.2) * scale, 1.8 * scale, b);
+    }
+    this.blob(x + (hero ? 0.5 : 0), y0 + trunk + 1.5, z + (hero ? 0.5 : 0), 3.2 * scale, 2.4 * scale, 99);
+    for (let k = 0; k < 6; k++) {                            // ferns at the foot
+      const fx = x + Math.round((hash(x, z, 30 + k) - 0.5) * 8), fz = z + Math.round((hash(z, x, 40 + k) - 0.5) * 8);
       if (fx >= 0 && fz >= 0 && fx < this.S && fz < this.S && this.top[this.idx(fx, fz)] === GRASS) this.sprites.push({ x: fx + 0.5, y: this.h(fx, fz), z: fz + 0.5, tile: "fern", s: 1 });
+    }
+  }
+  poplar(x: number, z: number) {
+    if (x < 3 || z < 3 || x > this.S - 4 || z > this.S - 4) return;
+    const y0 = this.h(x, z), H = 11 + Math.floor(hash(x, z, 17) * 5);
+    for (let y = -1; y < H - 2; y++) this.set(x, y0 + y, z, LOG, true);
+    for (let y = 3; y <= H; y++) {
+      const R = 1.6 * Math.sin(Math.PI * Math.min(1, (y - 2) / (H - 1))) + 0.3;
+      for (let dz = -2; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) if (dx * dx + dz * dz <= R * R + hash(x + dx, z + dz, y) * 0.8) this.set(x + dx, y0 + y, z + dz, LEAVES);
+    }
+  }
+  bush(x: number, z: number) { const y0 = this.h(x, z); this.blob(x, y0 + 0.4, z, 1.3 + hash(x, z, 18), 1.0, 7); }
+  boulder(x: number, z: number) {
+    const y0 = this.h(x, z), n = 2 + Math.floor(hash(x, z, 19) * 5);
+    for (let k = 0; k < n; k++) {
+      const dx = Math.round((hash(x, z, 100 + k) - 0.5) * 3), dz = Math.round((hash(z, x, 110 + k) - 0.5) * 3);
+      const tall = hash(x, z, 120 + k) < 0.35 ? 1 : 0;
+      for (let y = -1; y <= tall; y++) this.set(x + dx, y0 + y, z + dz, hash(x + dx, z + dz, 130) < 0.5 ? COBBLE : STONE, true);
     }
   }
 
@@ -114,6 +150,8 @@ export class VoxelSet {
       case GRAVEL: return face === "top" ? "gravel" : depth < 3 ? "gravel" : "stone";
       case CLAY: return depth < 6 ? "clay" : "stone";
       case STONE: return "stone";
+      case COBBLE: return "cobble";
+      case DIRT: return face === "top" ? "dirt" : depth < 4 ? "dirt" : "stone";
       case LOG: return face === "side" ? "logSide" : "logTop";
       case LEAVES: return "leaves";
       default: return "dirt";
@@ -186,7 +224,7 @@ export function meshChunk(set: VoxelSet, ox: number, oz: number, cs = 32) {
     if (x < ox || x >= xEnd || z < oz || z >= zEnd) continue;
     for (const f of FACES) {
       const nb = set.sparse.get(set.key(x + f.n[0], y + f.n[1], z + f.n[2]));
-      if (y + f.n[1] < set.h(x + f.n[0], z + f.n[2]) || nb === LOG) continue;   // hidden by ground or a log
+      if (y + f.n[1] < set.h(x + f.n[0], z + f.n[2]) || (nb !== undefined && nb !== LEAVES)) continue;   // hidden by ground or an opaque block
       if (type === LEAVES && nb === LEAVES) continue;                            // inner leaf faces
       emitFace(type === LEAVES ? leaves : solid, set, x, y, z, f, set.tileFor(type, f.face, 0), type === LEAVES ? 0.95 : 1);
     }
@@ -207,7 +245,7 @@ export function spriteGeometry(set: VoxelSet) {
       b.p.push(wx - dx, wy, wz - dz, wx + dx, wy, wz + dz, wx + dx, wy + H, wz + dz, wx - dx, wy + H, wz - dz);
       for (let k = 0; k < 4; k++) b.n.push(0, 1, 0);
       b.uv.push(u0, v0, u1, v0, u1, v1, u0, v1);
-      b.c.push(0.62, 0.62, 0.62, 0.62, 0.62, 0.62, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9);
+      b.c.push(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.74, 0.74, 0.74, 0.74, 0.74, 0.74);
       b.i.push(base, base + 1, base + 2, base, base + 2, base + 3);
     }
   }

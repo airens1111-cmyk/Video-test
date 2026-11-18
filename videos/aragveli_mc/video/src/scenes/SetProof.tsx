@@ -19,7 +19,7 @@ import { HOLE } from "../world/terrainGen";
 import { getAtlas } from "../world2/atlas";
 import { meshChunk, spriteGeometry, VoxelSet } from "../world2/set";
 
-const SET = { cx: 1600, cz: 900, size: 384, hero: [[1505, 806]] as [number, number][], clear: [[1470, 768, 40], [1440, 740, 30], [1560, 880, 60]] as [number, number, number][] };
+const SET = { cx: 1600, cz: 900, size: 384, hero: [[1512, 812]] as [number, number][], clear: [[1452, 742, 22], [1480, 775, 22], [1440, 735, 18], [1512, 812, 14]] as [number, number, number][] };
 
 export const SetProof: React.FC<{ shot?: "medium" | "wide" | "low" }> = ({ shot = "medium" }) => {
   const data = useTerrain("tbilisi");
@@ -28,9 +28,9 @@ export const SetProof: React.FC<{ shot?: "medium" | "wide" | "low" }> = ({ shot 
 };
 
 const SHOTS: Record<string, { pos: [number, number, number]; look: [number, number, number]; lens: number; focus: number; fstop: number }> = {
-  medium: { pos: [1470, 1.7, 768], look: [1560, 6, 880], lens: 35, focus: 52, fstop: 2.8 },
-  wide: { pos: [1440, 14, 740], look: [1720, 2, 1020], lens: 24, focus: 120, fstop: 8 },
-  low: { pos: [1492, 0.45, 794], look: [1515, 3, 812], lens: 24, focus: 12, fstop: 2.0 },
+  medium: { pos: [1452, 1.5, 742], look: [1514, 8, 816], lens: 50, focus: 96, fstop: 2.4 },
+  wide: { pos: [1440, 12, 735], look: [1640, 4, 960], lens: 28, focus: 90, fstop: 5.6 },
+  low: { pos: [1496, 0.35, 796], look: [1516, 4, 816], lens: 28, focus: 24, fstop: 1.8 },
 };
 
 const Inner: React.FC<{ data: TerrainData; shot: string }> = ({ data, shot }) => {
@@ -38,19 +38,19 @@ const Inner: React.FC<{ data: TerrainData; shot: string }> = ({ data, shot }) =>
   const { width, height } = useVideoConfig();
   HOLE.r = { x0: SET.cx - SET.size / 2 + 8, z0: SET.cz - SET.size / 2 + 8, x1: SET.cx + SET.size / 2 - 8, z1: SET.cz + SET.size / 2 - 8 };
   const set = useMemo(() => new VoxelSet(data, SET), [data]);
-  const preset = PRESETS.goldenHour;
+  const preset = PRESETS.filmDay;
   const s = SHOTS[shot];
   const pos = new THREE.Vector3(s.pos[0], set.groundY(s.pos[0], s.pos[2]) + s.pos[1], s.pos[2]);
   const target = new THREE.Vector3(s.look[0], set.groundY(s.look[0], s.look[2]) + s.look[1], s.look[2]);
   const cs: CamState = { pos, target, lens: s.lens, roll: 0, focus: s.focus, fstop: s.fstop, yawOffset: 0, pitchOffset: 0, motion: [0, 0] };
   const wa = THREE.MathUtils.degToRad(preset.wind.dir);
   const wind = useMemo(() => new THREE.Vector2(Math.sin(wa), -Math.cos(wa)), [wa]);
-  const emitters = windDust(10, () => target.clone(), 70, preset.particles.windDust, (x, z) => set.groundY(x, z));
+  const emitters = windDust(10, () => target.clone(), 70, preset.particles.windDust, (x, z) => set.groundY(x, z)).slice(0, 0);   // no dust in the proof (grains near the lens read as floating cubes)
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <ThreeCanvas width={width} height={height} shadows gl={{ antialias: false, alpha: false }} camera={{ fov: 40, near: 0.1, far: 40000 }}>
+      <ThreeCanvas width={width} height={height} shadows="percentage" gl={{ antialias: false, alpha: false }} camera={{ fov: 40, near: 0.1, far: 40000 }}>
         <Cam cs={cs} />
-        <Atmosphere preset={preset} t={frame / 24} focus={target} fogBase={set.baseY + 20} shadowSize={110} shadowRes={4096} />
+        <Atmosphere preset={preset} t={frame / 24} focus={target} fogBase={set.baseY + 20} shadowSize={110} shadowRes={4096} shadowSoft={4} />
         <SetMesh set={set} />
         <Terrain data={data} cam={pos} lodK={2.0} />
         <Vegetation data={data} cam={pos} radius={1600} grass={false} />

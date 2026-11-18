@@ -18,19 +18,20 @@ const pick = (pal: RGB[], v: number) => pal[Math.max(0, Math.min(pal.length - 1,
 type Px = (x: number, y: number, c: RGB | null) => void;
 const PAINT: Record<TileName, (px: Px, r: () => number) => void> = {
   grassTop: (px, r) => {                                   // dry September grass, gold with olive
-    const pal = ["#7f8a3a", "#93983f", "#a9a24a", "#bba95a", "#8c9440", "#6f7f34"].map(hex);
+    const pal = ["#71803f", "#7f8b46", "#8e944e", "#9d9a55", "#aaa05c", "#66773a"].map(hex);
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(pal, (r() + r()) / 2));
-    for (let k = 0; k < 10; k++) px(Math.floor(r() * 16), Math.floor(r() * 16), hex("#d6c46e"));
+    for (let k = 0; k < 9; k++) px(Math.floor(r() * 16), Math.floor(r() * 16), hex("#c2b26a"));
+    for (let k = 0; k < 6; k++) px(Math.floor(r() * 16), Math.floor(r() * 16), hex("#5a6a32"));
   },
   grassSide: (px, r) => {
-    const dirt = ["#6e4c33", "#7d583b", "#8a6444", "#5f412c"].map(hex), grass = ["#9c9a44", "#b5a64a", "#a39a42", "#8f8a3a"].map(hex);
+    const dirt = ["#6e4c33", "#7d583b", "#8a6444", "#5f412c"].map(hex), grass = ["#7f8b46", "#8e944e", "#9d9a55", "#71803f"].map(hex);
     for (let x = 0; x < 16; x++) {
       const lip = 3 + (r() < 0.45 ? 1 : 0) + (r() < 0.2 ? 1 : 0);
       for (let y = 0; y < 16; y++) px(x, y, y < lip ? pick(grass, r()) : pick(dirt, r()));
     }
   },
   dirt: (px, r) => { const p = ["#6e4c33", "#7d583b", "#8a6444", "#5f412c", "#93704f"].map(hex); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(p, r())); },
-  coarseDirt: (px, r) => { const p = ["#6e4c33", "#5a4030", "#8a6444", "#7a7066", "#93704f"].map(hex); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(p, r())); },
+  coarseDirt: (px, r) => { const p = ["#6a5a3c", "#5e5034", "#7a6a48", "#7a7462", "#6f7a40"].map(hex); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(p, r())); },
   path: (px, r) => {
     const p = ["#9a7e55", "#a88a5e", "#8c7149", "#b39668"].map(hex);
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(p, (r() + r()) / 2));
@@ -43,7 +44,7 @@ const PAINT: Record<TileName, (px: Px, r: () => number) => void> = {
   },
   gravel: (px, r) => { const p = ["#8d8680", "#a39b93", "#6f6965", "#b8b0a6", "#7e776f"].map(hex); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(p, r())); },
   logSide: (px, r) => {
-    const p = ["#3d342a", "#4a3f32", "#56493a", "#332b22"].map(hex);
+    const p = ["#5a4632", "#6b5540", "#7a6249", "#4d3b2a", "#86704f"].map(hex);
     for (let x = 0; x < 16; x++) { const base = r(); for (let y = 0; y < 16; y++) px(x, y, pick(p, base * 0.7 + r() * 0.3)); }
     for (let k = 0; k < 4; k++) px(Math.floor(r() * 16), Math.floor(r() * 16), hex("#2e2216"));
   },

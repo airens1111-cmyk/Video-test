@@ -104,6 +104,7 @@ def tex(r, base, k=0.1):
 def head_base(S, skin, hair, eyes="#3a2a1e", age=0.0, beard=None, beard_col=None, moustache=True, hair_long=False, brow=None):
     r = S.r
     S.skin_tone = skin
+    S.face = {"skin": skin, "iris": eyes, "brow": brow or hair, "beard": bool(beard), "age": age}
     brow = brow or hair
 
     def f(u, v, w, h, s):
@@ -112,24 +113,15 @@ def head_base(S, skin, hair, eyes="#3a2a1e", age=0.0, beard=None, beard_col=None
             return tex(r, hair, 0.12)
         if s == "bottom":
             return mul(hexc(skin), 0.8)
-        if s == "front":
+        if s == "front":                                  # eyes, brows and mouth are animated by the face rig
             if v <= 1:
                 return tex(r, hair, 0.12)
-            if v == 2 and u in (1, 2, 5, 6):
-                return tex(r, brow, 0.1)
-            if v == 3:
-                if u in (1, 6):
-                    return hexc("#f2efe8")
-                if u in (2, 5):
-                    return hexc(eyes)
-            if v == 4 and u in (3, 4):
+            if v == 5 and u in (3, 4):
                 return mul(hexc(skin), 0.86)                 # nose shadow
-            if age > 0.5 and v == 4 and u in (1, 6):
-                return mul(hexc(skin), 0.88)                 # wrinkles under the eyes
-            if v == 6 and u in (3, 4):
-                return hexc("#5a2c24")                        # mouth
-            if v == 5 and u in (2, 5):
-                return mul(hexc(skin), 0.92)
+            if age > 0.5 and v == 5 and u in (1, 6):
+                return mul(hexc(skin), 0.88)                 # lines under the eyes
+            if v in (3, 4) and u in (0, 7):
+                return mul(hexc(skin), 0.93)                 # temples
             return c
         # sides and back: hair band, ears
         if v <= (6 if (s == "back" or hair_long) else 2):
@@ -145,11 +137,9 @@ def head_base(S, skin, hair, eyes="#3a2a1e", age=0.0, beard=None, beard_col=None
             if s == "front":
                 if moustache and v == 5 and 1 <= u <= 6 and u not in (3, 4):
                     return tex(r, bc, 0.12)
-                if moustache and v == 5 and u in (3, 4):
-                    return tex(r, bc, 0.1)
-                if beard == "full" and v >= 6 and not (v == 6 and u in (3, 4)):
+                if beard == "full" and v >= 6:
                     return tex(r, bc, 0.14)
-                if beard == "full" and v == 4 and u in (0, 7):
+                if beard == "full" and v in (4, 5) and u in (0, 7):
                     return tex(r, bc, 0.14)
                 if beard == "short" and v == 7 and 1 <= u <= 6:
                     return tex(r, bc, 0.14)
@@ -275,7 +265,7 @@ def mail(S, part, rows, base="#7d8085", layer="over"):
     S.paint(part, "all", f, layer)
 
 
-def papakha(S, col="#2a2420", rows=3):
+def papakha(S, col="#2a2420", rows=2):
     def f(u, v, w, h, s):
         if s == "bottom":
             return None
@@ -599,7 +589,7 @@ def main():
         S.save(os.path.join(OUT, cid + ".png"))
         if acc is not None:
             Image.fromarray(acc, "RGBA").save(os.path.join(OUT, cid + "_acc.png"))
-        meta.append({"id": cid, "name": name, "basis": note, "acc": extra})
+        meta.append({"id": cid, "name": name, "basis": note, "acc": extra, "face": S.face})
         print(cid)
     json.dump(meta, open(os.path.join(OUT, "skins.json"), "w"), indent=1, ensure_ascii=False)
 

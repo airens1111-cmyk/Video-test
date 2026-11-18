@@ -4,6 +4,7 @@ import { FLYOVERS, STILLS } from "./camera/shots";
 import { BattleTest } from "./scenes/BattleTest";
 import { SetProof as SP } from "./scenes/SetProof";
 import { CharacterSheet as CS } from "./scenes/CharacterSheet";
+import { FaceAnim, FaceSheet } from "./scenes/FaceTest";
 const CharacterSheet = CS as unknown as React.FC<Record<string, unknown>>;
 const SetProof = SP as unknown as React.FC<Record<string, unknown>>;
 import { WorldShot as WS } from "./scenes/WorldShot";
@@ -35,6 +36,8 @@ export const Root: React.FC = () => (
     {(["front", "back", "three"] as const).map((view) => (
       <Composition key={view} id={`Chars-${view}`} component={CharacterSheet} durationInFrames={1} {...MASTER} defaultProps={{ view }} />
     ))}
+    <Composition id="Faces-sheet" component={FaceSheet} durationInFrames={1} {...MASTER} />
+    <Composition id="Faces-anim" component={FaceAnim} durationInFrames={8 * 24} {...MASTER} />
     <Composition id="BattleTest" component={BattleTest} durationInFrames={300} fps={30} width={1080} height={1920} />
   </>
 );

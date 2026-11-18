@@ -20,43 +20,92 @@
      0
     ]
    }
+  },
+  "face": {
+   "skin": "#d8a47e",
+   "iris": "#4a3626",
+   "brow": "#bcb6ac",
+   "beard": true,
+   "age": 1.0
   }
  },
  {
   "id": "aragveli_mail",
   "name": "Aragvian highlander — mail",
   "basis": "highland mail hauberk + embroidered tunic (ethnographic, 19th c. records) — Б",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#b9845e",
+   "iris": "#2a3a4a",
+   "brow": "#4a3424",
+   "beard": true,
+   "age": 0.0
+  }
  },
  {
   "id": "aragveli_chokha",
   "name": "Aragvian highlander — chokha",
   "basis": "chokha with gazyri, papakha (Pshavi, Mtiuleti) — А/Б",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#d9a77f",
+   "iris": "#4a5a3a",
+   "brow": "#4a3424",
+   "beard": true,
+   "age": 0.0
+  }
  },
  {
   "id": "aragveli_elder",
   "name": "Aragvian elder — burka",
   "basis": "felt cloak (burka), felt cap — Б",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#c9946c",
+   "iris": "#4a5a3a",
+   "brow": "#1e1814",
+   "beard": true,
+   "age": 0.0
+  }
  },
  {
   "id": "georgian_soldier",
   "name": "Kartli-Kakheti soldier",
   "basis": "Kartli-Kakheti chokha: black, dark red or blue — А",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#c9946c",
+   "iris": "#3a2a1e",
+   "brow": "#2a1e16",
+   "beard": true,
+   "age": 0.0
+  }
  },
  {
   "id": "imeretian_soldier",
   "name": "Imeretian soldier",
   "basis": "Imeretian dress, small cap — stylisation",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#d9a77f",
+   "iris": "#3a2a1e",
+   "brow": "#3a2a1e",
+   "beard": false,
+   "age": 0.0
+  }
  },
  {
   "id": "royal_guard",
   "name": "King's bodyguard",
   "basis": "mail under chokha, helmet with aventail — Б",
-  "acc": {}
+  "acc": {},
+  "face": {
+   "skin": "#c9946c",
+   "iris": "#3a2a1e",
+   "brow": "#2a1e16",
+   "beard": true,
+   "age": 0.0
+  }
  },
  {
   "id": "qajar_infantry",
@@ -79,6 +128,13 @@
      0
     ]
    }
+  },
+  "face": {
+   "skin": "#c9946c",
+   "iris": "#3a2a1e",
+   "brow": "#1e1814",
+   "beard": true,
+   "age": 0.0
   }
  },
  {
@@ -102,6 +158,13 @@
      0
     ]
    }
+  },
+  "face": {
+   "skin": "#d9a77f",
+   "iris": "#3a2a1e",
+   "brow": "#1e1814",
+   "beard": true,
+   "age": 0.0
   }
  },
  {
@@ -125,6 +188,13 @@
      0
     ]
    }
+  },
+  "face": {
+   "skin": "#d6b08e",
+   "iris": "#2a2018",
+   "brow": "#2a2420",
+   "beard": false,
+   "age": 0.8
   }
  }
 ]

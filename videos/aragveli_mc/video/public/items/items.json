@@ -1,0 +1,29 @@
+[
+ {
+  "id": "khmali",
+  "size": 20,
+  "grip": [
+   4,
+   15
+  ],
+  "scale": 1.0
+ },
+ {
+  "id": "shamshir",
+  "size": 20,
+  "grip": [
+   4,
+   15
+  ],
+  "scale": 1.0
+ },
+ {
+  "id": "khanjali",
+  "size": 14,
+  "grip": [
+   3,
+   11
+  ],
+  "scale": 0.7
+ }
+]

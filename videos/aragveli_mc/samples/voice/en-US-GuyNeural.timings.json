@@ -1,0 +1,329 @@
+{
+ "duration": 25.018,
+ "words": [
+  {
+   "word": "September",
+   "start": 0.5,
+   "end": 1.144,
+   "speaker": "narrator"
+  },
+  {
+   "word": "seventeen",
+   "start": 1.339,
+   "end": 1.936,
+   "speaker": "narrator"
+  },
+  {
+   "word": "ninety-five",
+   "start": 1.964,
+   "end": 2.811,
+   "speaker": "narrator"
+  },
+  {
+   "word": "A",
+   "start": 3.263,
+   "end": 3.3,
+   "speaker": "narrator"
+  },
+  {
+   "word": "valley",
+   "start": 3.328,
+   "end": 3.703,
+   "speaker": "narrator"
+  },
+  {
+   "word": "south",
+   "start": 3.73,
+   "end": 4.133,
+   "speaker": "narrator"
+  },
+  {
+   "word": "of",
+   "start": 4.147,
+   "end": 4.272,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Tbilisi",
+   "start": 4.3,
+   "end": 5.05,
+   "speaker": "narrator"
+  },
+  {
+   "word": "On",
+   "start": 5.715,
+   "end": 5.83,
+   "speaker": "narrator"
+  },
+  {
+   "word": "one",
+   "start": 5.858,
+   "end": 6.08,
+   "speaker": "narrator"
+  },
+  {
+   "word": "side",
+   "start": 6.094,
+   "end": 6.455,
+   "speaker": "narrator"
+  },
+  {
+   "word": "one",
+   "start": 6.691,
+   "end": 6.872,
+   "speaker": "narrator"
+  },
+  {
+   "word": "of",
+   "start": 6.886,
+   "end": 6.969,
+   "speaker": "narrator"
+  },
+  {
+   "word": "the",
+   "start": 6.997,
+   "end": 7.108,
+   "speaker": "narrator"
+  },
+  {
+   "word": "greatest",
+   "start": 7.136,
+   "end": 7.622,
+   "speaker": "narrator"
+  },
+  {
+   "word": "armies",
+   "start": 7.65,
+   "end": 8.053,
+   "speaker": "narrator"
+  },
+  {
+   "word": "the",
+   "start": 8.08,
+   "end": 8.205,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Caucasus",
+   "start": 8.233,
+   "end": 8.803,
+   "speaker": "narrator"
+  },
+  {
+   "word": "had",
+   "start": 8.83,
+   "end": 8.983,
+   "speaker": "narrator"
+  },
+  {
+   "word": "seen",
+   "start": 9.011,
+   "end": 9.428,
+   "speaker": "narrator"
+  },
+  {
+   "word": "On",
+   "start": 9.938,
+   "end": 10.06,
+   "speaker": "narrator"
+  },
+  {
+   "word": "the",
+   "start": 10.088,
+   "end": 10.213,
+   "speaker": "narrator"
+  },
+  {
+   "word": "other",
+   "start": 10.24,
+   "end": 10.574,
+   "speaker": "narrator"
+  },
+  {
+   "word": "a",
+   "start": 10.796,
+   "end": 10.865,
+   "speaker": "narrator"
+  },
+  {
+   "word": "small",
+   "start": 10.879,
+   "end": 11.31,
+   "speaker": "narrator"
+  },
+  {
+   "word": "kingdom",
+   "start": 11.324,
+   "end": 11.865,
+   "speaker": "narrator"
+  },
+  {
+   "word": "and",
+   "start": 12.34,
+   "end": 12.456,
+   "speaker": "narrator"
+  },
+  {
+   "word": "three",
+   "start": 12.484,
+   "end": 12.748,
+   "speaker": "narrator"
+  },
+  {
+   "word": "hundred",
+   "start": 12.776,
+   "end": 13.165,
+   "speaker": "narrator"
+  },
+  {
+   "word": "men",
+   "start": 13.179,
+   "end": 13.457,
+   "speaker": "narrator"
+  },
+  {
+   "word": "from",
+   "start": 13.484,
+   "end": 13.665,
+   "speaker": "narrator"
+  },
+  {
+   "word": "the",
+   "start": 13.693,
+   "end": 13.79,
+   "speaker": "narrator"
+  },
+  {
+   "word": "mountains",
+   "start": 13.818,
+   "end": 14.47,
+   "speaker": "narrator"
+  },
+  {
+   "word": "By",
+   "start": 15.45,
+   "end": 15.516,
+   "speaker": "narrator"
+  },
+  {
+   "word": "treaty",
+   "start": 15.53,
+   "end": 15.989,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Russia",
+   "start": 16.252,
+   "end": 16.558,
+   "speaker": "narrator"
+  },
+  {
+   "word": "had",
+   "start": 16.586,
+   "end": 16.766,
+   "speaker": "narrator"
+  },
+  {
+   "word": "promised",
+   "start": 16.78,
+   "end": 17.239,
+   "speaker": "narrator"
+  },
+  {
+   "word": "to",
+   "start": 17.266,
+   "end": 17.364,
+   "speaker": "narrator"
+  },
+  {
+   "word": "protect",
+   "start": 17.377,
+   "end": 17.808,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Georgia",
+   "start": 17.822,
+   "end": 18.35,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Its",
+   "start": 18.812,
+   "end": 18.96,
+   "speaker": "narrator"
+  },
+  {
+   "word": "help",
+   "start": 18.988,
+   "end": 19.266,
+   "speaker": "narrator"
+  },
+  {
+   "word": "never",
+   "start": 19.28,
+   "end": 19.641,
+   "speaker": "narrator"
+  },
+  {
+   "word": "came",
+   "start": 19.669,
+   "end": 20.113,
+   "speaker": "narrator"
+  },
+  {
+   "word": "Russia",
+   "start": 20.833,
+   "end": 21.13,
+   "speaker": "king"
+  },
+  {
+   "word": "promised",
+   "start": 21.144,
+   "end": 21.624,
+   "speaker": "king"
+  },
+  {
+   "word": "to",
+   "start": 21.639,
+   "end": 21.74,
+   "speaker": "king"
+  },
+  {
+   "word": "protect",
+   "start": 21.755,
+   "end": 22.235,
+   "speaker": "king"
+  },
+  {
+   "word": "us",
+   "start": 22.249,
+   "end": 22.612,
+   "speaker": "king"
+  },
+  {
+   "word": "Now",
+   "start": 23.078,
+   "end": 23.236,
+   "speaker": "king"
+  },
+  {
+   "word": "we",
+   "start": 23.251,
+   "end": 23.396,
+   "speaker": "king"
+  },
+  {
+   "word": "stand",
+   "start": 23.411,
+   "end": 23.818,
+   "speaker": "king"
+  },
+  {
+   "word": "alone",
+   "start": 23.832,
+   "end": 24.356,
+   "speaker": "king"
+  }
+ ]
+}

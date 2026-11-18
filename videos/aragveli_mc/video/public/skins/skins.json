@@ -1,0 +1,130 @@
+[
+ {
+  "id": "erekle_ii",
+  "name": "King Erekle II (aged 75)",
+  "basis": "portrait, mid–late 18th c. (Commons, PD); grey beard for his age — stylisation",
+  "acc": {
+   "hat": {
+    "size": [
+     9,
+     6,
+     9
+    ],
+    "uv": [
+     0,
+     0
+    ],
+    "offset": [
+     0,
+     7.5,
+     0
+    ]
+   }
+  }
+ },
+ {
+  "id": "aragveli_mail",
+  "name": "Aragvian highlander — mail",
+  "basis": "highland mail hauberk + embroidered tunic (ethnographic, 19th c. records) — Б",
+  "acc": {}
+ },
+ {
+  "id": "aragveli_chokha",
+  "name": "Aragvian highlander — chokha",
+  "basis": "chokha with gazyri, papakha (Pshavi, Mtiuleti) — А/Б",
+  "acc": {}
+ },
+ {
+  "id": "aragveli_elder",
+  "name": "Aragvian elder — burka",
+  "basis": "felt cloak (burka), felt cap — Б",
+  "acc": {}
+ },
+ {
+  "id": "georgian_soldier",
+  "name": "Kartli-Kakheti soldier",
+  "basis": "Kartli-Kakheti chokha: black, dark red or blue — А",
+  "acc": {}
+ },
+ {
+  "id": "imeretian_soldier",
+  "name": "Imeretian soldier",
+  "basis": "Imeretian dress, small cap — stylisation",
+  "acc": {}
+ },
+ {
+  "id": "royal_guard",
+  "name": "King's bodyguard",
+  "basis": "mail under chokha, helmet with aventail — Б",
+  "acc": {}
+ },
+ {
+  "id": "qajar_infantry",
+  "name": "Qajar army infantryman",
+  "basis": "long coat, sash, felt cap (kolah namadi, 1845 depiction) — Б",
+  "acc": {
+   "hat": {
+    "size": [
+     7,
+     5,
+     7
+    ],
+    "uv": [
+     0,
+     0
+    ],
+    "offset": [
+     0,
+     6.5,
+     0
+    ]
+   }
+  }
+ },
+ {
+  "id": "qajar_cavalry",
+  "name": "Qajar army horseman",
+  "basis": "mail, helmet with aventail, sash — Б (cavalry was the core of the army — А)",
+  "acc": {
+   "hat": {
+    "size": [
+     2,
+     4,
+     2
+    ],
+    "uv": [
+     0,
+     0
+    ],
+    "offset": [
+     0,
+     6,
+     0
+    ]
+   }
+  }
+ },
+ {
+  "id": "agha_mohammad_khan",
+  "name": "Agha Mohammad Khan",
+  "basis": "contemporary portrait dated 1795 (Commons, PD) — А",
+  "acc": {
+   "hat": {
+    "size": [
+     9,
+     8,
+     9
+    ],
+    "uv": [
+     0,
+     0
+    ],
+    "offset": [
+     0,
+     8.5,
+     0
+    ]
+   }
+  }
+ }
+]

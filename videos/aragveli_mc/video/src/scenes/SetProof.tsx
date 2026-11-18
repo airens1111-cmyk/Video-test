@@ -20,7 +20,7 @@ import { getAtlas } from "../world2/atlas";
 import { meshChunk, spriteGeometry, VoxelSet } from "../world2/set";
 import { Character, standPose, useSkins } from "../characters/Character";
 
-const SET = { cx: 1600, cz: 900, size: 384, hero: [[1512, 812]] as [number, number][], clear: [[1452, 742, 22], [1480, 775, 22], [1440, 735, 18], [1512, 812, 14], [1492, 789, 12]] as [number, number, number][] };
+export const SET = { cx: 1600, cz: 900, size: 384, hero: [[1512, 812]] as [number, number][], clear: [[1452, 742, 22], [1480, 775, 22], [1440, 735, 18], [1512, 812, 14], [1492, 789, 12]] as [number, number, number][] };
 
 export const SetProof: React.FC<{ shot?: "medium" | "wide" | "low" | "cast" }> = ({ shot = "medium" }) => {
   const data = useTerrain("tbilisi");
@@ -65,13 +65,13 @@ const Inner: React.FC<{ data: TerrainData; shot: string }> = ({ data, shot }) =>
   );
 };
 
-const Cam: React.FC<{ cs: CamState }> = ({ cs }) => {
+export const Cam: React.FC<{ cs: CamState }> = ({ cs }) => {
   const { camera, size } = useThree();
   useLayoutEffect(() => { (camera as THREE.PerspectiveCamera).near = 0.1; applyCamera(camera as THREE.PerspectiveCamera, cs, size.width / size.height); });
   return null;
 };
 
-const SetMesh: React.FC<{ set: VoxelSet }> = ({ set }) => {
+export const SetMesh: React.FC<{ set: VoxelSet }> = ({ set }) => {
   const group = useMemo(() => {
     const atlas = getAtlas();
     const solid = patch(new THREE.MeshLambertMaterial({ map: atlas, vertexColors: true }), {});

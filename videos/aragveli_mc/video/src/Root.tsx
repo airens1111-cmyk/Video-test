@@ -5,6 +5,8 @@ import { BattleTest } from "./scenes/BattleTest";
 import { SetProof as SP } from "./scenes/SetProof";
 import { CharacterSheet as CS } from "./scenes/CharacterSheet";
 import { FaceAnim, FaceSheet } from "./scenes/FaceTest";
+import { PoseTest as PT } from "./scenes/PoseTest";
+const PoseTest = PT as unknown as React.FC<Record<string, unknown>>;
 const CharacterSheet = CS as unknown as React.FC<Record<string, unknown>>;
 const SetProof = SP as unknown as React.FC<Record<string, unknown>>;
 import { WorldShot as WS } from "./scenes/WorldShot";
@@ -38,6 +40,9 @@ export const Root: React.FC = () => (
     ))}
     <Composition id="Faces-sheet" component={FaceSheet} durationInFrames={1} {...MASTER} />
     <Composition id="Faces-anim" component={FaceAnim} durationInFrames={8 * 24} {...MASTER} />
+    {(["cry", "shock"] as const).map((beat) => (
+      <Composition key={beat} id={`Pose-${beat}`} component={PoseTest} durationInFrames={4 * 24} {...MASTER} defaultProps={{ beat }} />
+    ))}
     <Composition id="BattleTest" component={BattleTest} durationInFrames={300} fps={30} width={1080} height={1920} />
   </>
 );

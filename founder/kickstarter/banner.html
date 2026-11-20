@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tamada banner</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@700;900&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#B3213A; --bg2:#8E1530; --cream:#FFF4E2; --gold:#FFC23D; --ink:#2A0E15; --teal:#1FB5A6; --pink:#FF7A8A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1024px;height:576px;overflow:hidden;background:var(--bg)}
+  body{font-family:Rubik,'Noto Sans Georgian',sans-serif;color:var(--cream);position:relative}
+  .bg{position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 78% 45%, #D23A52 0, transparent 55%),
+      radial-gradient(circle at 10% 110%, var(--bg2) 0, transparent 55%),
+      var(--bg);}
+  /* grape-vine ornament dots */
+  .dots{position:absolute;inset:0;opacity:.13;
+    background-image:radial-gradient(var(--gold) 2px, transparent 2.5px);
+    background-size:28px 28px;}
+  .confetti span{position:absolute;border-radius:3px}
+  .left{position:absolute;left:52px;top:52px;width:480px}
+  .ka{font-family:'Noto Sans Georgian';font-weight:900;color:var(--gold);font-size:34px;letter-spacing:1px}
+  h1{font-weight:900;font-size:100px;line-height:.9;letter-spacing:-2px;margin-top:2px;
+     text-shadow:0 6px 0 var(--bg2)}
+  .tag{font-weight:700;font-size:28px;line-height:1.18;margin-top:22px}
+  .tag b{color:var(--gold)}
+  .chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+  .chip{background:rgba(255,244,226,.14);border:2px solid rgba(255,244,226,.35);border-radius:999px;
+        padding:7px 14px;font-weight:700;font-size:17px}
+  .steps{position:absolute;left:0;right:0;bottom:0;height:62px;background:var(--ink);
+         display:flex;align-items:center;justify-content:center;gap:20px;font-weight:700;font-size:18px;white-space:nowrap}
+  .steps .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;
+            background:var(--gold);color:var(--ink);font-weight:900;margin-right:10px;font-size:17px}
+  .steps .arrow{color:var(--gold);opacity:.7}
+  /* cards */
+  .card{position:absolute;border-radius:22px;box-shadow:0 18px 30px rgba(40,5,15,.45)}
+  .theme{left:548px;top:84px;width:215px;height:300px;background:var(--ink);transform:rotate(-9deg);
+         border:5px solid var(--gold);padding:26px 22px;color:var(--cream)}
+  .theme .lbl{font-size:15px;font-weight:800;letter-spacing:3px;color:var(--gold)}
+  .theme .t{font-size:31px;font-weight:900;line-height:1.05;margin-top:16px}
+  .theme .tk{font-family:'Noto Sans Georgian';font-size:15px;font-weight:700;margin-top:14px;color:#F5C9A8}
+  .theme .glass{position:absolute;bottom:22px;left:22px;font-size:44px}
+  .word{width:235px;height:330px;background:var(--cream);color:var(--ink);padding:22px 20px;border:5px solid var(--cream)}
+  .word.back{left:780px;top:58px;transform:rotate(14deg);background:var(--gold);border-color:var(--gold)}
+  .word.front{left:735px;top:110px;transform:rotate(5deg)}
+  .word .lbl{font-size:14px;font-weight:800;letter-spacing:3px;color:var(--bg)}
+  .w{margin-top:14px}
+  .w .k{font-family:'Noto Sans Georgian';font-weight:900;font-size:30px;line-height:1.1}
+  .w .e{font-weight:700;font-size:17px;color:#7A4A52;margin-top:2px}
+  .plus{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--bg);color:var(--cream);
+        font-weight:900;font-size:32px;margin:12px 0 8px}
+  .timer{position:absolute;left:640px;top:378px;width:104px;height:104px;border-radius:50%;background:var(--gold);color:var(--ink);
+         display:grid;place-items:center;text-align:center;font-weight:900;transform:rotate(8deg);
+         box-shadow:0 10px 20px rgba(40,5,15,.4);border:5px solid var(--ink)}
+  .timer .big{font-size:40px;line-height:.9}
+  .timer .s{font-size:14px;letter-spacing:2px}
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="dots"></div>
+  <div class="confetti">
+    <span style="left:520px;top:30px;width:14px;height:14px;background:var(--teal);transform:rotate(20deg)"></span>
+    <span style="left:600px;top:470px;width:12px;height:20px;background:var(--gold);transform:rotate(-30deg)"></span>
+    <span style="left:975px;top:40px;width:16px;height:16px;background:var(--pink);border-radius:50%"></span>
+    <span style="left:470px;top:420px;width:10px;height:10px;background:var(--pink);transform:rotate(40deg)"></span>
+    <span style="left:830px;top:480px;width:14px;height:14px;background:var(--teal);border-radius:50%"></span>
+  </div>
+
+  <div class="left">
+    <div class="ka">თამადა</div>
+    <h1>TAMADA</h1>
+    <p class="tag">The party card game where you<br>give a toast with <b>two words<br>that don't belong together.</b></p>
+    <div class="chips">
+      <span class="chip">12+</span>
+      <span class="chip">3–6 friends</span>
+      <span class="chip">15–20 min</span>
+      <span class="chip">No phones</span>
+    </div>
+  </div>
+
+  <div class="card theme">
+    <div class="lbl">TOAST TO…</div>
+    <div class="t">Our teachers!</div>
+    <div class="tk">ჩვენს მასწავლებლებს!</div>
+    <div class="glass">🥤</div>
+  </div>
+
+  <div class="card word back"></div>
+
+  <div class="card word front">
+    <div class="lbl">WORD CARD</div>
+    <div class="w"><div class="k">სიდედრი</div><div class="e">mother-in-law</div></div>
+    <div class="plus">+</div>
+    <div class="w"><div class="k">ჰიპოტენუზა</div><div class="e">hypotenuse</div></div>
+  </div>
+
+  <div class="timer"><div><div class="big">30</div><div class="s">SEC</div></div></div>
+
+  <div class="steps">
+    <span><span class="n">1</span>Draw a toast topic</span><span class="arrow">→</span>
+    <span><span class="n">2</span>Link both words in 30 seconds</span><span class="arrow">→</span>
+    <span><span class="n">3</span>The Tamada picks the funniest</span>
+  </div>
+</body>
+</html>

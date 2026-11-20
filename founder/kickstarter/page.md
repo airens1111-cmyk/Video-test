@@ -73,7 +73,7 @@ The first edition is **in Georgian**. It is made in Georgia, for Georgian kids. 
 |---|---|---|
 | **[20 zł]** Supporter | Our thanks + your name on the "Friends of TAMADA" page on our website | Digital only |
 | **[70 zł]** One deck | 1 TAMADA deck | Main reward |
-| **[70 zł]** Early Bird (limited: [100]) | 1 deck + **6 bonus word cards** made only for the first print run | Same price, extra cards |
+| **[70 zł]** Early Bird (limited: [300]) | 1 deck + **6 bonus word cards** made only for the first print run | Same price, extra cards |
 | **[125 zł]** One for you, one for a friend | 2 decks | Gift pack |
 | **[300 zł]** Class pack | 5 decks | For a class, a club or a camp |
 | **[500 zł]** Write a card (limited: [20]) | 2 decks + **you co-write one word pair** that goes into the printed game | We approve the pair together |
@@ -81,17 +81,17 @@ The first edition is **in Georgian**. It is made in Georgia, for Georgian kids. 
 Shipping: [decide where you ship: Georgia only, or Georgia + EU. The price of shipping is shown at checkout].
 
 ## Funding goal
-**[9 000 zł]**
+**[37 000 zł]**
 
 What the money is for:
-- printing the first run of 250 decks in Georgia (≈ 8 200 zł);
+- printing the first run of **1,000 decks** in Georgia (≈ 32 800 zł);
 - Kickstarter and payment fees (about 8–10%);
 - professional proofreading of the Georgian text.
 
 ## Stretch goals
-- **[12 000 zł]:** 12 extra word cards in every deck.
-- **[18 000 zł]:** an **English edition** of TAMADA.
-- **[25 000 zł]:** a first expansion pack: "School edition".
+- **[45 000 zł]:** 12 extra word cards in every deck.
+- **[60 000 zł]:** an **English edition** of TAMADA.
+- **[80 000 zł]:** a first expansion pack: "School edition".
 
 ---
 

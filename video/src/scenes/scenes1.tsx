@@ -137,76 +137,131 @@ export const S02: React.FC = () => {
   );
 };
 
-/* ---------------- 03 brain / synapse ---------------- */
 const DOT_COLORS = [C.accent, C.yellow, "#8FB3FF"];
+
+/* ---------------- 03 brain / synapse ---------------- */
+const NT = [
+  { name: "დოფამინი", c: C.accent },
+  { name: "სეროტონინი", c: C.yellow },
+  { name: "ნორადრენალინი", c: "#8FB3FF" },
+];
 export const S03: React.FC = () => {
   const id = "s03";
   const f = useCurrentFrame();
-  const tDa = cue(id, "დოფამინით");
-  const tSe = cue(id, "სეროტონინითა");
-  const tNe = cue(id, "ნორადრენალინით");
-  const tRelease = cue(id, "გამოყოფს");
+  const tTalk = cue(id, "ესაუბრებიან");
+  const tDa = cue(id, "დოფამინი");
+  const tSe = cue(id, "სეროტონინი");
+  const tNe = cue(id, "ნორადრენალინი");
+  const tFlood = cue(id, "ყრის");
   const tBlock = cue(id, "ბლოკავს");
-  const tStrong = cue(id, "ძლიერდება");
+  const tBoom = cue(id, "აფეთქება");
   const types = [tDa, tSe, tNe];
-  const pBlock = usePop(tBlock, 260);
-  const glow = useRamp(tStrong, 8);
-  const pulse = 0.5 + 0.5 * Math.sin((f - tStrong) / 6);
-  const dots = Array.from({ length: 46 }, (_, i) => {
+
+  // synapse geometry
+  const termBottom = 300;          // bottom edge of the upper terminal
+  const membY = 470;               // post-synaptic membrane line
+  const recX = [300, 420, 540, 660];
+  const pBlock = usePop(tBlock, 240);
+  const boom = useRamp(tBoom, 10);
+  const pulse = 0.5 + 0.5 * Math.sin((f - tBoom) / 5);
+
+  // one demo messenger crosses first (on "ესაუბრებიან")
+  const demo = interpolate(f, [tTalk, tTalk + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
+  const demoX = 480, dyTop = termBottom - 6, dyBot = membY - 22;
+
+  // three named messengers dock (one per word)
+  const named = types.map((at, k) => {
+    const p = interpolate(f, [at, at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
+    return { p, x: 480 + (recX[k + 1] - 480) * p, y: dyTop + (membY - 40 - dyTop) * p - Math.sin(p * Math.PI) * 26, c: NT[k].c };
+  });
+
+  // flood from the bursting vesicle (on "ყრის")
+  const flood = Array.from({ length: 34 }, (_, i) => {
+    const at = tFlood + i * 0.8;
+    const p = interpolate(f, [at, at + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.quad) });
     const type = i % 3;
-    const at = i < 9 ? types[type] + Math.floor(i / 3) * 2 : tRelease + (i - 9) * 0.7;
-    const p = interpolate(f, [at, at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad) });
-    const sx = 400 + seeded(i) * 160;
-    const sy = 235 + seeded(i + 50) * 60;
+    const sx = 455 + seeded(i) * 50;          // from vesicle mouth
     const ex = 300 + seeded(i + 99) * 360;
-    const ey = 405 + seeded(i + 7) * 70 + Math.sin((f + i * 9) / 8) * 5;
+    const ey = membY - 30 + seeded(i + 7) * 24 + Math.sin((f + i * 9) / 8) * 4;
     const x = sx + (ex - sx) * p;
-    const y = sy + (ey - sy) * p - Math.sin(p * Math.PI) * 30;
+    const y = dyTop + (ey - dyTop) * p - Math.sin(p * Math.PI) * 34;
     return { type, p, x, y };
   });
+  const burst = usePop(tFlood, 200);
+
   return (
     <Stage>
       <Svg>
-        <DrawPath at={0} dur={16} d="M300 20 C300 130 250 200 250 290 C250 360 330 382 480 382 C630 382 710 360 710 290 C710 200 660 130 660 20" />
-        {[[410, 250], [490, 290], [570, 248], [450, 180], [530, 190]].map(([x, y], i) => (
-          <DrawPath key={i} at={6 + i * 2} dur={10} d={`M${x + 28} ${y} A28 28 0 1 1 ${x + 27.9} ${y - 2}`} strokeWidth={2.5} opacity={0.8} />
-        ))}
-        <GFade at={10}><rect x={668} y={300} width={34} height={56} rx={10} fill="none" stroke={C.accent} strokeWidth={3} /></GFade>
-        <DrawPath at={6} dur={18} d="M160 540 C320 498 640 498 800 540" />
-        {[330, 420, 510, 600].map((x, i) => (
-          <g key={i}>
-            <DrawPath at={10 + i * 2} dur={10} d={`M${x - 18} 500 L${x - 18} 522 L${x + 18} 522 L${x + 18} 500`} stroke={C.accent} strokeWidth={3} />
-            <rect x={x - 26} y={492} width={52} height={40} rx={8} fill={C.accent} opacity={0.35 * glow * (0.6 + 0.4 * pulse)} />
+        {/* upper neuron terminal */}
+        <DrawPath at={0} dur={14} d={`M300 10 C300 120 250 200 250 ${termBottom - 10} C250 ${termBottom + 30} 330 ${termBottom + 50} 480 ${termBottom + 50} C630 ${termBottom + 50} 710 ${termBottom + 30} 710 ${termBottom - 10} C710 200 660 120 660 10`} />
+        {/* vesicle that will burst */}
+        <GPop at={6} cx={480} cy={termBottom - 20}>
+          <circle cx={480} cy={termBottom - 20} r={26} fill="none" stroke={C.accent} strokeWidth={3} opacity={0.9} />
+          <circle cx={480} cy={termBottom - 20} r={13} fill={C.accent} opacity={0.3 + 0.4 * burst} />
+        </GPop>
+        {/* post-synaptic membrane + receptors */}
+        <DrawPath at={6} dur={16} d={`M150 ${membY + 50} C320 ${membY + 8} 640 ${membY + 8} 810 ${membY + 50}`} />
+        {recX.map((x, i) => {
+          const lit = i === 0 ? demo : i <= 3 ? named[i - 1]?.p ?? 0 : 0;
+          const litAll = Math.max(lit, boom);
+          return (
+            <g key={i}>
+              <DrawPath at={10 + i * 2} dur={10} d={`M${x - 18} ${membY + 2} L${x - 18} ${membY + 24} L${x + 18} ${membY + 24} L${x + 18} ${membY + 2}`} stroke={C.accent} strokeWidth={3} />
+              <rect x={x - 26} y={membY - 8} width={52} height={42} rx={8} fill={i === 0 ? C.line : NT[Math.min(i - 1, 2)].c} opacity={0.5 * litAll * (0.6 + 0.4 * pulse)} />
+            </g>
+          );
+        })}
+        {/* gap label */}
+        <GFade at={2}>
+          <line x1={150} x2={210} y1={termBottom + 70} y2={membY + 20} stroke="rgba(213,230,255,0.4)" strokeWidth={1.5} strokeDasharray="4 5" />
+        </GFade>
+        {/* demo messenger crossing */}
+        {demo > 0 && demo < 1 && (
+          <g>
+            <line x1={demoX} y1={dyTop + (dyBot - dyTop) * Math.max(0, demo - 0.12)} x2={demoX} y2={dyTop + (dyBot - dyTop) * demo} stroke={C.line} strokeWidth={3} opacity={0.5} strokeLinecap="round" />
+            <circle cx={demoX} cy={dyTop + (dyBot - dyTop) * demo - Math.sin(demo * Math.PI) * 22} r={12} fill={C.line} />
+          </g>
+        )}
+        {/* three named messengers */}
+        {named.map((d, i) => d.p > 0 && d.p < 1 && <circle key={i} cx={d.x} cy={d.y} r={11} fill={d.c} />)}
+        {/* flood with short motion trails */}
+        {flood.map((d, i) => d.p > 0 && (
+          <g key={i} opacity={d.p < 0.98 ? 0.95 : 0.55}>
+            <circle cx={d.x} cy={d.y} r={8} fill={DOT_COLORS[d.type]} />
           </g>
         ))}
-        {dots.map((d, i) => (
-          <circle key={i} cx={d.x} cy={d.y} r={9} fill={DOT_COLORS[d.type]} opacity={d.p > 0 && d.p < 0.999 ? 0.95 : d.p >= 0.999 ? 0.6 : 0} />
-        ))}
-        <GPop at={tBlock} cx={685} cy={328}>
-          <circle cx={685} cy={328} r={38} fill="rgba(255,106,77,0.15)" stroke={C.danger} strokeWidth={4} />
-          <path d="M669 312 L701 344 M701 312 L669 344" stroke={C.danger} strokeWidth={6} strokeLinecap="round" transform={`scale(${0.9 + 0.1 * Math.sin(f / 5)})`} transform-origin="685 328" />
+        {/* release arrow */}
+        <DrawPath at={tFlood} dur={10} d={`M150 ${termBottom - 40} L150 ${termBottom + 60}`} stroke={C.yellow} strokeWidth={4} />
+        <GPop at={tFlood + 7} cx={150} cy={termBottom + 60}>
+          <path d={`M150 ${termBottom + 60} L138 ${termBottom + 40} M150 ${termBottom + 60} L162 ${termBottom + 40}`} stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" />
         </GPop>
-        <DrawPath at={tRelease} dur={10} d="M200 300 L200 440" stroke={C.yellow} strokeWidth={4} />
-        <GPop at={tRelease + 7} cx={200} cy={440}>
-          <path d="M200 440 L188 420 M200 440 L212 420" stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" />
+        {/* reuptake transporter + block */}
+        <GFade at={tFlood - 6}><rect x={690} y={membY - 20} width={34} height={56} rx={10} fill="none" stroke={C.accent} strokeWidth={3} /></GFade>
+        <GPop at={tBlock} cx={707} cy={membY + 8}>
+          <circle cx={707} cy={membY + 8} r={34} fill="rgba(255,106,77,0.15)" stroke={C.danger} strokeWidth={4} />
+          <path d={`M693 ${membY - 6} L721 ${membY + 22} M721 ${membY - 6} L693 ${membY + 22}`} stroke={C.danger} strokeWidth={6} strokeLinecap="round" />
         </GPop>
+        {/* boom glow across the gap */}
+        {boom > 0 && <rect x={200} y={termBottom + 40} width={520} height={membY - termBottom - 10} rx={20} fill={C.yellow} opacity={0.1 * boom * (0.5 + 0.5 * pulse)} />}
       </Svg>
-      <L x={20} y={40} at={2}><span style={kaText(26, 800, C.dim)}>ნეირონი</span></L>
-      <L x={20} y={560} at={8}><span style={kaText(26, 800, C.dim)}>მეორე ნეირონი</span></L>
-      <L x={70} y={330} at={tRelease + 2} center><span style={kaText(26, 800, C.yellow)}>გამოყოფა</span></L>
-      <L x={742} y={248} at={tBlock} style={{ textAlign: "left" }}>
-        <div style={kaText(26, 800, C.danger)}>უკუშეწოვა</div>
-        <div style={kaText(22, 700, C.danger)}>დაბლოკილია</div>
+      <L x={20} y={30} at={2}><span style={kaText(26, 800, C.dim)}>ნეირონი</span></L>
+      <L x={20} y={membY + 70} at={8}><span style={kaText(26, 800, C.dim)}>მეორე ნეირონი</span></L>
+      <L x={56} y={termBottom + 60} at={2} center><span style={kaText(22, 700, "rgba(213,230,255,0.75)")}>სინაფსი</span></L>
+      <L x={70} y={termBottom - 30} at={tFlood + 2} center><span style={kaText(26, 800, C.yellow)}>გამოყოფა</span></L>
+      <L x={735} y={membY - 34} at={tBlock} style={{ textAlign: "left" }}>
+        <div style={kaText(24, 800, C.danger)}>უკუშეწოვა</div>
+        <div style={kaText(20, 700, C.danger)}>დაბლოკილია</div>
       </L>
-      {[["დოფამინი", tDa, 0], ["სეროტონინი", tSe, 1], ["ნორადრენალინი", tNe, 2]].map(([t, at, k], i) => (
-        <L key={i} x={[0, 270, 560][i]} y={632} at={at as number}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ width: 22, height: 22, borderRadius: 11, background: DOT_COLORS[k as number], display: "inline-block", boxShadow: `0 0 10px ${DOT_COLORS[k as number]}` }} />
-            <span style={kaText(30, 800)}>{t as string}</span>
+      {/* legend builds as the three are named */}
+      {NT.map((n, i) => (
+        <L key={i} x={[20, 290, 560][i]} y={membY + 170} at={types[i]}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ width: 20, height: 20, borderRadius: 10, background: n.c, display: "inline-block", boxShadow: `0 0 10px ${n.c}` }} />
+            <span style={kaText(26, 800)}>{n.name}</span>
           </div>
         </L>
       ))}
-      <Sticker at={tStrong} text="სიგნალი — ზედმეტად ძლიერი" style={{ left: 250, top: 712 }} rotate={-2} />
+      <Sticker at={tBoom} text="სიგნალი — ზედმეტად ძლიერი" style={{ left: 250, top: membY + 230 }} rotate={-2} />
     </Stage>
   );
 };

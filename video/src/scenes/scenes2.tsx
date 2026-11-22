@@ -20,25 +20,35 @@ export const S05: React.FC = () => {
   const id = "s05";
   const f = useCurrentFrame();
   const tHeart = cue(id, "გული");
-  const beat = f > tHeart ? 1 + 0.1 * Math.max(0, Math.sin(((f - tHeart) / 30) * Math.PI * 2 * 2.4)) : 1;
-  const ecg = useRamp(tHeart, 24);
+  const beatPhase = f > tHeart ? ((f - tHeart) / 30) * Math.PI * 2 * 2.4 : 0;
+  const beat = f > tHeart ? 1 + 0.12 * Math.max(0, Math.sin(beatPhase)) : 1;
+  const ecg = useRamp(tHeart, 22);
+  const sweep = interpolate(f, [tHeart, tHeart + 44], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const stroke = { stroke: C.danger, strokeWidth: 3, fill: "none", strokeLinecap: "round" as const };
-  // ECG trace sweeps a moving dot
-  const sweep = interpolate(f, [tHeart, tHeart + 40], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // clean upper-body silhouette (bust): head + shoulders + torso
+  const body = "M160 455 L172 300 Q176 250 210 232 Q232 222 232 206 Q210 196 206 168 A66 66 0 1 1 338 168 Q334 196 312 206 Q312 222 334 232 Q368 250 372 300 L384 455 Z";
+  const headGlow = 0.4 + 0.3 * Math.sin(f / 14);
   return (
     <Stage>
       <Svg>
-        <DrawPath at={0} dur={16} d="M190 70 A56 56 0 1 1 189.9 70" />
-        <DrawPath at={2} dur={22} d="M150 196 C110 210 90 250 86 330 L80 520 M290 196 C330 210 350 250 354 330 L360 520 M150 196 L290 196 M120 270 L130 560 L310 560 L320 270" />
-        <g transform={`translate(240 300) scale(${beat})`}>
+        {/* body fill then outline draws on */}
+        <GFade at={0} dur={14}><path d={body} fill="rgba(52,227,220,0.05)" /></GFade>
+        <DrawPath at={0} dur={22} d={body} stroke={C.line} strokeWidth={3.5} />
+        {/* subtle inner body-scan line */}
+        <GFade at={6}>
+          <line x1={150} x2={394} y1={300 + ((f * 3) % 150)} y2={300 + ((f * 3) % 150)} stroke="rgba(52,227,220,0.25)" strokeWidth={2} />
+        </GFade>
+        {/* heart */}
+        <g transform={`translate(272 322) scale(${beat})`}>
           <GPop at={tHeart} cx={0} cy={0}>
-            <path d="M0 18 C-30 -6 -32 -30 -14 -34 C-4 -36 0 -28 0 -22 C0 -28 4 -36 14 -34 C32 -30 30 -6 0 18 Z" fill="rgba(255,106,77,0.3)" stroke={C.danger} strokeWidth={4} />
+            <path d="M0 20 C-34 -8 -36 -34 -16 -38 C-5 -40 0 -31 0 -24 C0 -31 5 -40 16 -38 C36 -34 34 -8 0 20 Z" fill="rgba(255,106,77,0.35)" stroke={C.danger} strokeWidth={4} />
           </GPop>
         </g>
-        <path d="M40 640 L150 640 L170 610 L190 680 L210 590 L230 650 L250 640 L420 640" fill="none" stroke={C.danger} strokeWidth={4} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - ecg} />
-        {sweep > 0 && sweep < 1 && <circle cx={40 + sweep * 380} cy={640} r={6} fill={C.danger} />}
+        {/* ECG along the bottom */}
+        <path d="M30 650 L150 650 L172 614 L196 700 L218 582 L240 664 L262 650 L430 650" fill="none" stroke={C.danger} strokeWidth={4} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - ecg} />
+        {sweep > 0 && sweep < 1 && <circle cx={30 + sweep * 400} cy={650} r={6} fill={C.danger} />}
       </Svg>
-      <div style={{ position: "absolute", left: 440, top: 36, display: "flex", flexDirection: "column", gap: 4 }}>
+      <div style={{ position: "absolute", left: 470, top: 30, display: "flex", flexDirection: "column", gap: 2 }}>
         <Item at={tHeart} color={C.danger} text="აჩქარებული გული" icon={<path d="M22 36 C6 24 6 10 14 8 C18 7 22 11 22 14 C22 11 26 7 30 8 C38 10 38 24 22 36 Z" {...stroke} />} />
         <Item at={cue(id, "წნევა")} color={C.danger} text="მაღალი წნევა" icon={<g {...stroke}><path d="M6 32 A16 16 0 1 1 38 32" /><path d="M22 32 L32 16" /></g>} />
         <Item at={cue(id, "გულმკერდში")} text="ტკივილი გულმკერდში" icon={<g {...stroke}><path d="M22 6 L14 22 L24 22 L18 38" /></g>} />
@@ -46,7 +56,7 @@ export const S05: React.FC = () => {
         <Item at={cue(id, "ყბის")} color={C.yellow} text="ყბის დაჭიმვა" icon={<g stroke={C.yellow} strokeWidth={3} fill="none"><path d="M8 16 C8 34 36 34 36 16" /><path d="M14 22 L30 22" /></g>} />
         <Item at={cue(id, "უძილობა")} color={C.yellow} text="უძილობა" icon={<g stroke={C.yellow} strokeWidth={3} fill="none"><path d="M28 8 A14 14 0 1 0 36 30 A11 11 0 1 1 28 8 Z" /></g>} />
       </div>
-      <DangerBlock at={cue(id, "მძიმე")} style={{ left: 440, top: 470, width: 470 }}>
+      <DangerBlock at={cue(id, "მძიმე")} style={{ left: 470, top: 476, width: 450 }}>
         <div style={kaText(26, 700, C.danger)}>მძიმე შემთხვევებში</div>
         <div style={kaText(36, 900, C.danger)}>კუნთები და თირკმელები</div>
       </DangerBlock>

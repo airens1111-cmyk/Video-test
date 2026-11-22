@@ -154,7 +154,7 @@ def load_voice():
     """Read the voice block from src/config.ts (single source of truth)."""
     with open(os.path.join(ROOT, "src", "config.ts"), encoding="utf-8") as f:
         src = f.read()
-    block = re.search(r"voice:\s*\{(.*?)\}", src, re.S).group(1)
+    block = re.search(r"edgeVoice:\s*\{(.*?)\}", src, re.S).group(1)
     get = lambda k: re.search(k + r':\s*"([^"]+)"', block).group(1)
     return {"voice": get("name"), "rate": get("rate"), "pitch": get("pitch")}
 

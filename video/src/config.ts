@@ -7,8 +7,18 @@ export const config = {
   slogan: "მეფედრონი · როგორ მოქმედებს",
   avatar: "avatar.png",
   outroLine: "მეტი მარტივი ახსნა — ჩვენს არხზე",
-  // Voice used by tools/tts.py (it parses this block).
+  // Voice. tools/tts_eleven.py (ElevenLabs, current) reads `voice`;
+  // tools/tts.py (edge-tts fallback, no key needed) reads `edgeVoice`.
   voice: {
+    provider: "elevenlabs",
+    name: "Chris",
+    id: "iP95p4xoKVk53GoZ742B",
+    model: "eleven_v4",
+    language: "ka",
+    // eleven_v4 ignores voice_settings.speed, so the audio is time-stretched (pitch kept)
+    tempo: "1.12",
+  },
+  edgeVoice: {
     name: "ka-GE-GiorgiNeural",
     rate: "+8%",
     pitch: "+3Hz",

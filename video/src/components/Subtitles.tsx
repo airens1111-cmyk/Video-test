@@ -45,7 +45,7 @@ export const Subtitles: React.FC = () => {
   const next = chunks[idx + 1];
   const hideAt = Math.min(next ? next.start : Infinity, ch.end + 0.5);
   if (t > hideAt) return null;
-  const inP = interpolate(t, [ch.start, ch.start + 0.12], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const inP = interpolate(t, [ch.start - 0.03, ch.start + 0.08], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <div
       style={{
@@ -67,10 +67,16 @@ export const Subtitles: React.FC = () => {
         const spoken = t >= w.start - 0.03;
         const kc = keywordColor(w.w);
         const color = spoken ? kc ?? config.colors.text : config.colors.subtitleIdle;
+        // the word being spoken right now pops a little
+        const age = t - w.start;
+        const pop = age >= -0.03 && age < 0.22 ? 1 + 0.12 * Math.sin(Math.min(1, (age + 0.03) / 0.25) * Math.PI) : 1;
         return (
           <span
             key={i}
             style={{
+              display: "inline-block",
+              transform: `scale(${pop})`,
+              filter: kc && spoken ? `drop-shadow(0 0 14px ${kc}66)` : undefined,
               fontFamily: config.fonts.ka,
               fontWeight: 900,
               fontSize: 80,

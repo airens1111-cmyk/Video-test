@@ -1,8 +1,8 @@
 import React from "react";
 import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
 import scriptJson from "../data/script.json";
-import { timings, FPS } from "./timing";
-import { Background, Fonts, Header, ProgressBar, SectionLabel, fadeInOut, sceneFrames } from "./components/chrome";
+import { timings, FPS, toFrames } from "./timing";
+import { Background, Fonts, Header, ProgressBar, SectionLabel, sceneTransform, sceneFrames } from "./components/chrome";
 import { Subtitles } from "./components/Subtitles";
 import { S01, S02, S03, S04 } from "./scenes/scenes1";
 import { S05, S06, S07, S08, S09, S10 } from "./scenes/scenes2";
@@ -12,36 +12,33 @@ const meta = scriptJson.scenes as { id: string; tag: string; label: string }[];
 
 const SceneWrap: React.FC<{ dur: number; first: boolean; children: React.ReactNode }> = ({ dur, first, children }) => {
   const f = useCurrentFrame();
-  // the first scene is the cover frame: no fade-in
-  const o = first ? Math.min(1, fadeInOut(f + 6, dur + 6)) : fadeInOut(f, dur);
-  return <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill>;
+  return <AbsoluteFill style={sceneTransform(f, dur, first)}>{children}</AbsoluteFill>;
 };
 
-const currentTag = (t: number) => {
-  let tag = meta[0].tag;
+const currentScene = (t: number) => {
+  let idx = 0;
   timings.scenes.forEach((s, i) => {
-    if (t >= s.start - 0.05) tag = meta[i].tag;
+    if (t >= s.start - 0.05) idx = i;
   });
-  return tag;
+  return idx;
 };
 
 export const Reel: React.FC = () => {
   const f = useCurrentFrame();
+  const idx = currentScene(f / FPS);
   return (
     <AbsoluteFill style={{ backgroundColor: "#040b20" }}>
       <Fonts />
       <Background />
       <Html5Audio src={staticFile("voice.wav")} />
-      <Header tag={currentTag(f / FPS)} />
+      <Header tag={meta[idx].tag} tagStart={idx === 0 ? -20 : toFrames(timings.scenes[idx].start)} />
       <ProgressBar />
       {timings.scenes.map((s, i) => {
         const { from, dur } = sceneFrames(s.id);
         const Comp = SCENES[s.id];
-        const start = from;
-        const length = dur;
         return (
-          <Sequence key={s.id} from={start} durationInFrames={length} name={`${s.id} ${meta[i].label}`}>
-            <SceneWrap dur={length} first={i === 0}>
+          <Sequence key={s.id} from={from} durationInFrames={dur} name={`${s.id} ${meta[i].label}`}>
+            <SceneWrap dur={dur} first={i === 0}>
               <SectionLabel n={i + 1} label={meta[i].label} danger={["s05", "s08"].includes(s.id)} />
               <Comp />
             </SceneWrap>

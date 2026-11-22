@@ -44,6 +44,20 @@ export const S05: React.FC = () => {
             <path d="M0 20 C-34 -8 -36 -34 -16 -38 C-5 -40 0 -31 0 -24 C0 -31 5 -40 16 -38 C36 -34 34 -8 0 20 Z" fill="rgba(255,106,77,0.35)" stroke={C.danger} strokeWidth={4} />
           </GPop>
         </g>
+        {/* brain hint in the head */}
+        <GFade at={2}>
+          <path d="M246 150 C236 136 258 128 266 140 C280 132 292 148 282 158 C292 170 276 182 266 174 C254 184 238 170 248 160 Z" fill="none" stroke={C.accent} strokeWidth={2.5} opacity={0.6 + 0.25 * Math.sin(f / 9)} />
+        </GFade>
+        {/* kidneys light up on the severe-case line */}
+        {(() => {
+          const lit = useRamp(cue(id, "კუნთები"), 10);
+          return (
+            <g opacity={lit}>
+              <path d="M214 396 C200 396 198 420 210 426 C222 430 224 410 214 396 Z" fill="rgba(255,106,77,0.3)" stroke={C.danger} strokeWidth={2.5} />
+              <path d="M330 396 C344 396 346 420 334 426 C322 430 320 410 330 396 Z" fill="rgba(255,106,77,0.3)" stroke={C.danger} strokeWidth={2.5} />
+            </g>
+          );
+        })()}
         {/* ECG along the bottom */}
         <path d="M30 650 L150 650 L172 614 L196 700 L218 582 L240 664 L262 650 L430 650" fill="none" stroke={C.danger} strokeWidth={4} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - ecg} />
         {sweep > 0 && sweep < 1 && <circle cx={30 + sweep * 400} cy={650} r={6} fill={C.danger} />}
@@ -89,7 +103,7 @@ export const S06: React.FC = () => {
       {steps.map((s, i) => (
         <L key={i} x={515} y={334 - i * 80} at={s.at}><span style={kaText(40, 900, s.c)}>{s.t}</span></L>
       ))}
-      <Appear at={tCard} dy={18} style={{ position: "absolute", left: 0, top: 470, width: 940, border: `2px solid rgba(213,230,255,0.35)`, borderRadius: 18, padding: "22px 30px", background: "rgba(8,18,44,0.7)" }}>
+      <Appear at={tCard} dy={18} style={{ position: "absolute", left: 0, top: 470, width: 940, border: `2px solid rgba(213,230,255,0.35)`, borderRadius: 18, padding: "22px 30px", background: "rgba(8,18,44,0.7)", boxShadow: "0 18px 50px rgba(2,8,24,0.6), 0 0 0 1px rgba(52,227,220,0.08)" }}>
         <div style={kaText(34, 900)}>მომდევნო დღეები</div>
         <div style={{ display: "flex", gap: 14, marginTop: 16, flexWrap: "wrap" }}>
           <Appear at={cue(id, "ცუდი")}><span style={chip(C.line)}>ცუდი ძილი</span></Appear>
@@ -199,7 +213,7 @@ export const S09: React.FC = () => {
   const scanY = interpolate(f, [tRow, tRow + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <Stage>
-      <Appear at={0} dy={16} style={{ position: "absolute", left: 0, top: 0, width: 940, borderRadius: 18, border: `2px solid rgba(213,230,255,0.4)`, background: "rgba(8,18,44,0.75)", padding: "22px 30px", overflow: "hidden" }}>
+      <Appear at={0} dy={16} style={{ position: "absolute", left: 0, top: 0, width: 940, borderRadius: 18, border: `2px solid rgba(213,230,255,0.4)`, background: "rgba(8,18,44,0.75)", padding: "22px 30px", overflow: "hidden", boxShadow: "0 18px 50px rgba(2,8,24,0.6)" }}>
         <div style={kaText(24, 700, C.dim)}>საქართველოს კანონი</div>
         <div style={kaText(32, 900)}>ნარკოტიკული საშუალებების შესახებ</div>
         <div style={{ ...kaText(26, 800, C.accent), marginTop: 14 }}>დანართი 1 · სია I</div>
@@ -240,7 +254,7 @@ export const S10: React.FC = () => {
   return (
     <Stage>
       <div style={{ opacity: out, pointerEvents: out < 0.05 ? "none" : undefined }}>
-        <Appear at={0} dy={20} style={{ position: "absolute", left: 0, top: 40, width: 940, borderRadius: 22, border: `3px solid ${C.accent}`, background: "rgba(8,18,44,0.75)", padding: "34px 36px", display: "flex", alignItems: "center", gap: 34 }}>
+        <Appear at={0} dy={20} style={{ position: "absolute", left: 0, top: 40, width: 940, borderRadius: 22, border: `3px solid ${C.accent}`, background: "rgba(8,18,44,0.75)", padding: "34px 36px", display: "flex", alignItems: "center", gap: 34, boxShadow: `0 18px 60px rgba(2,8,24,0.7), 0 0 40px ${C.accent}22` }}>
           <svg width={150} height={150} viewBox="0 0 150 150">
             <circle cx={75} cy={75} r={70} fill="rgba(52,227,220,0.12)" stroke={C.accent} strokeWidth={4} />
             <path d="M60 35 H90 V60 H115 V90 H90 V115 H60 V90 H35 V60 H60 Z" fill={C.accent} transform={`scale(${0.94 + 0.06 * Math.sin(f / 8)})`} transform-origin="75 75" />

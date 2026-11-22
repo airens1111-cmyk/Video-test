@@ -43,8 +43,17 @@ export const Background: React.FC = () => {
   const f = useCurrentFrame();
   const drift = (f * 0.35) % 60;
   const scanY = ((f * 6) % 2600) - 300;
+  const b1x = 300 + Math.sin(f / 90) * 120;
+  const b1y = 520 + Math.cos(f / 110) * 90;
+  const b2x = 820 + Math.sin(f / 70 + 2) * 110;
+  const b2y = 1300 + Math.cos(f / 95 + 1) * 120;
   return (
     <AbsoluteFill style={{ background: `linear-gradient(180deg, ${C.bgTop} 0%, #081638 45%, ${C.bgBottom} 100%)` }}>
+      {/* soft depth blobs */}
+      <AbsoluteFill style={{ filter: "blur(70px)", opacity: 0.6 }}>
+        <div style={{ position: "absolute", left: b1x, top: b1y, width: 460, height: 460, borderRadius: "50%", background: "radial-gradient(circle, rgba(52,227,220,0.18), transparent 70%)" }} />
+        <div style={{ position: "absolute", left: b2x, top: b2y, width: 520, height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(70,110,230,0.2), transparent 70%)" }} />
+      </AbsoluteFill>
       <AbsoluteFill
         style={{
           backgroundImage: `linear-gradient(${C.grid} 1px, transparent 1px), linear-gradient(90deg, ${C.grid} 1px, transparent 1px)`,
@@ -71,7 +80,45 @@ export const Background: React.FC = () => {
       </svg>
       <AbsoluteFill style={{ background: `linear-gradient(180deg, transparent ${scanY - 60}px, rgba(52,227,220,0.05) ${scanY}px, transparent ${scanY + 60}px)` }} />
       <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 40%, rgba(40,90,200,0.2), transparent 60%)" }} />
+      {/* vignette for depth */}
+      <AbsoluteFill style={{ boxShadow: "inset 0 0 420px 80px rgba(2,6,20,0.85)" }} />
     </AbsoluteFill>
+  );
+};
+
+/** Full-screen wipe that "clears the table" at every scene boundary. */
+export const TransitionSweep: React.FC = () => {
+  const f = useCurrentFrame();
+  const W = config.video.width;
+  return (
+    <>
+      {timings.scenes.slice(1).map((s, i) => {
+        const start = toFrames(s.start);
+        const d = f - (start - 6);
+        if (d < 0 || d > 14) return null;
+        const p = d / 14;
+        // a bright diagonal bar sweeps left->right, wiping the old scene away
+        const x = -500 + p * (W + 1000);
+        const op = Math.sin(p * Math.PI);
+        return (
+          <AbsoluteFill key={i} style={{ pointerEvents: "none" }}>
+            <div
+              style={{
+                position: "absolute",
+                top: -200,
+                bottom: -200,
+                left: x,
+                width: 420,
+                transform: "skewX(-12deg)",
+                background: `linear-gradient(90deg, transparent, ${C.accent}22 35%, ${C.accent}cc 50%, ${C.accent}22 65%, transparent)`,
+                opacity: op,
+                filter: "blur(2px)",
+              }}
+            />
+          </AbsoluteFill>
+        );
+      })}
+    </>
   );
 };
 
@@ -197,11 +244,13 @@ export const DangerBlock: React.FC<{ at: number; children: React.ReactNode; styl
 export const sceneTransform = (frame: number, dur: number, first: boolean) => {
   const inP = first ? 1 : interpolate(frame, [0, 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   const outP = interpolate(frame, [dur - 7, dur], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.in(Easing.cubic) });
-  const push = 1 + 0.035 * (frame / Math.max(1, dur));
+  const push = 1 + 0.04 * (frame / Math.max(1, dur));
+  const exitScale = 1 - outP * 0.08;
   return {
     opacity: Math.min(inP, 1 - outP),
-    transform: `translateX(${(1 - inP) * 120 - outP * 120}px) scale(${push})`,
+    transform: `translateX(${(1 - inP) * 140 - outP * 160}px) scale(${push * exitScale})`,
     transformOrigin: "50% 45%",
+    filter: outP > 0 ? `blur(${outP * 5}px)` : undefined,
   } as React.CSSProperties;
 };
 

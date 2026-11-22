@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
 import scriptJson from "../data/script.json";
 import { timings, FPS, toFrames } from "./timing";
-import { Background, Fonts, Header, ProgressBar, SectionLabel, sceneTransform, sceneFrames } from "./components/chrome";
+import { Background, Fonts, Header, ProgressBar, SectionLabel, sceneTransform, sceneFrames, TransitionSweep } from "./components/chrome";
 import { Subtitles } from "./components/Subtitles";
 import { S01, S02, S03, S04 } from "./scenes/scenes1";
 import { S05, S06, S07, S08, S09, S10 } from "./scenes/scenes2";
@@ -30,7 +30,7 @@ export const Reel: React.FC = () => {
     <AbsoluteFill style={{ backgroundColor: "#040b20" }}>
       <Fonts />
       <Background />
-      <Html5Audio src={staticFile("voice.wav")} />
+      <Html5Audio src={staticFile("mix.wav")} />
       <Header tag={meta[idx].tag} tagStart={idx === 0 ? -20 : toFrames(timings.scenes[idx].start)} />
       <ProgressBar />
       {timings.scenes.map((s, i) => {
@@ -45,6 +45,7 @@ export const Reel: React.FC = () => {
           </Sequence>
         );
       })}
+      <TransitionSweep />
       <Subtitles />
     </AbsoluteFill>
   );

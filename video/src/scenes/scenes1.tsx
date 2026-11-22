@@ -51,10 +51,18 @@ export const S01: React.FC = () => {
   const float = useWave(70) * 8;
   return (
     <Stage>
-      <Appear at={-20} style={{ position: "absolute", left: 0, top: 0 }}>
-        <div style={kaText(76, 900)}>რა არის</div>
-        <div style={kaText(86, 900, C.accent)}>მეფედრონი?</div>
-      </Appear>
+      {(() => {
+        // cold-open slam: title drops in big, then settles with a glitch tick
+        const s1 = interpolate(f, [0, 7], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+        const s2 = interpolate(f, [5, 13], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.back(2)) });
+        const gx = f > 13 && f < 20 ? (f % 2 ? 4 : -4) : 0;
+        return (
+          <div style={{ position: "absolute", left: 0, top: 0 }}>
+            <div style={{ ...kaText(76, 900), opacity: s1, transform: `translateX(${(1 - s1) * -60}px)` }}>რა არის</div>
+            <div style={{ ...kaText(96, 900, C.accent), opacity: Math.min(1, s2 * 1.4), transform: `translateX(${gx}px) scale(${0.7 + 0.3 * s2})`, transformOrigin: "left center", textShadow: `0 0 ${26 * Math.min(1, s2)}px ${C.accent}55` }}>მეფედრონი?</div>
+          </div>
+        );
+      })()}
       <Svg>
         {/* orbiting molecule icon */}
         <g transform={`translate(0 ${float})`}>
@@ -145,6 +153,12 @@ const NT = [
   { name: "სეროტონინი", c: C.yellow },
   { name: "ნორადრენალინი", c: "#8FB3FF" },
 ];
+const Badge: React.FC<{ x: number; y: number; n: string; at: number }> = ({ x, y, n, at }) => (
+  <GPop at={at} cx={x} cy={y}>
+    <circle cx={x} cy={y} r={17} fill={C.accent} />
+    <text x={x} y={y + 7} textAnchor="middle" fill="#04202a" fontFamily={config.fonts.mono} fontWeight={700} fontSize={22}>{n}</text>
+  </GPop>
+);
 export const S03: React.FC = () => {
   const id = "s03";
   const f = useCurrentFrame();
@@ -157,111 +171,103 @@ export const S03: React.FC = () => {
   const tBoom = cue(id, "აფეთქება");
   const types = [tDa, tSe, tNe];
 
-  // synapse geometry
-  const termBottom = 300;          // bottom edge of the upper terminal
-  const membY = 470;               // post-synaptic membrane line
-  const recX = [300, 420, 540, 660];
+  const siteX = 480, siteY = 300;      // release site on the sender membrane
+  const membY = 476;                   // receiver membrane line
+  const recX = [320, 430, 540, 650];
   const pBlock = usePop(tBlock, 240);
   const boom = useRamp(tBoom, 10);
   const pulse = 0.5 + 0.5 * Math.sin((f - tBoom) / 5);
 
-  // one demo messenger crosses first (on "ესაუბრებიან")
+  // demo messenger crosses first
   const demo = interpolate(f, [tTalk, tTalk + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
-  const demoX = 480, dyTop = termBottom - 6, dyBot = membY - 22;
-
-  // three named messengers dock (one per word)
+  // three named messengers dock
   const named = types.map((at, k) => {
     const p = interpolate(f, [at, at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
-    return { p, x: 480 + (recX[k + 1] - 480) * p, y: dyTop + (membY - 40 - dyTop) * p - Math.sin(p * Math.PI) * 26, c: NT[k].c };
+    return { p, x: siteX + (recX[k + 1] - siteX) * p, y: siteY + (membY - 42 - siteY) * p - Math.sin(p * Math.PI) * 30, c: NT[k].c };
   });
-
-  // flood from the bursting vesicle (on "ყრის")
-  const flood = Array.from({ length: 34 }, (_, i) => {
+  // flood from the release site
+  const flood = Array.from({ length: 30 }, (_, i) => {
     const at = tFlood + i * 0.8;
     const p = interpolate(f, [at, at + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.quad) });
-    const type = i % 3;
-    const sx = 455 + seeded(i) * 50;          // from vesicle mouth
+    const sx = siteX - 24 + seeded(i) * 48;
     const ex = 300 + seeded(i + 99) * 360;
-    const ey = membY - 30 + seeded(i + 7) * 24 + Math.sin((f + i * 9) / 8) * 4;
+    const ey = membY - 34 + seeded(i + 7) * 26 + Math.sin((f + i * 9) / 8) * 4;
     const x = sx + (ex - sx) * p;
-    const y = dyTop + (ey - dyTop) * p - Math.sin(p * Math.PI) * 34;
-    return { type, p, x, y };
+    const y = siteY + (ey - siteY) * p - Math.sin(p * Math.PI) * 36;
+    return { type: i % 3, p, x, y };
   });
   const burst = usePop(tFlood, 200);
 
   return (
     <Stage>
       <Svg>
-        {/* upper neuron terminal */}
-        <DrawPath at={0} dur={14} d={`M300 10 C300 120 250 200 250 ${termBottom - 10} C250 ${termBottom + 30} 330 ${termBottom + 50} 480 ${termBottom + 50} C630 ${termBottom + 50} 710 ${termBottom + 30} 710 ${termBottom - 10} C710 200 660 120 660 10`} />
-        {/* vesicle that will burst */}
-        <GPop at={6} cx={480} cy={termBottom - 20}>
-          <circle cx={480} cy={termBottom - 20} r={26} fill="none" stroke={C.accent} strokeWidth={3} opacity={0.9} />
-          <circle cx={480} cy={termBottom - 20} r={13} fill={C.accent} opacity={0.3 + 0.4 * burst} />
+        {/* sender neuron terminal (top bulb) */}
+        <DrawPath at={0} dur={14} d={`M250 -10 C250 110 250 180 250 ${siteY - 20} C250 ${siteY + 24} 340 ${siteY + 40} 480 ${siteY + 40} C620 ${siteY + 40} 710 ${siteY + 24} 710 ${siteY - 20} C710 180 710 110 710 -10`} fill="rgba(52,227,220,0.04)" />
+        {/* receiver neuron surface (bottom) */}
+        <DrawPath at={6} dur={16} d={`M120 ${membY + 60} C320 ${membY + 6} 640 ${membY + 6} 840 ${membY + 60}`} />
+        {/* cleft callout + flow arrow */}
+        <GFade at={2}>
+          <path d={`M470 ${siteY + 60} C460 ${siteY + 110} 460 ${membY - 70} 470 ${membY - 20}`} fill="none" stroke="rgba(213,230,255,0.35)" strokeWidth={2} strokeDasharray="4 6" />
+          <path d={`M470 ${membY - 20} l-10 -16 m10 16 l10 -16`} fill="none" stroke="rgba(213,230,255,0.5)" strokeWidth={2} strokeLinecap="round" />
+        </GFade>
+        {/* release site (vesicle) */}
+        <GPop at={6} cx={siteX} cy={siteY}>
+          <circle cx={siteX} cy={siteY} r={24} fill="none" stroke={C.yellow} strokeWidth={3} />
+          <circle cx={siteX} cy={siteY} r={12} fill={C.yellow} opacity={0.35 + 0.45 * burst} />
         </GPop>
-        {/* post-synaptic membrane + receptors */}
-        <DrawPath at={6} dur={16} d={`M150 ${membY + 50} C320 ${membY + 8} 640 ${membY + 8} 810 ${membY + 50}`} />
+        {/* receptors as docking slots */}
         {recX.map((x, i) => {
-          const lit = i === 0 ? demo : i <= 3 ? named[i - 1]?.p ?? 0 : 0;
+          const lit = i === 0 ? demo : named[i - 1]?.p ?? 0;
           const litAll = Math.max(lit, boom);
+          const col = i === 0 ? C.line : NT[Math.min(i - 1, 2)].c;
           return (
             <g key={i}>
-              <DrawPath at={10 + i * 2} dur={10} d={`M${x - 18} ${membY + 2} L${x - 18} ${membY + 24} L${x + 18} ${membY + 24} L${x + 18} ${membY + 2}`} stroke={C.accent} strokeWidth={3} />
-              <rect x={x - 26} y={membY - 8} width={52} height={42} rx={8} fill={i === 0 ? C.line : NT[Math.min(i - 1, 2)].c} opacity={0.5 * litAll * (0.6 + 0.4 * pulse)} />
+              <DrawPath at={10 + i * 2} dur={10} d={`M${x - 20} ${membY + 4} L${x - 20} ${membY - 14} L${x - 7} ${membY - 14} L${x - 7} ${membY - 2} L${x + 7} ${membY - 2} L${x + 7} ${membY - 14} L${x + 20} ${membY - 14} L${x + 20} ${membY + 4}`} stroke={C.accent} strokeWidth={3} />
+              <rect x={x - 28} y={membY - 12} width={56} height={44} rx={8} fill={col} opacity={0.5 * litAll * (0.6 + 0.4 * pulse)} />
             </g>
           );
         })}
-        {/* gap label */}
-        <GFade at={2}>
-          <line x1={150} x2={210} y1={termBottom + 70} y2={membY + 20} stroke="rgba(213,230,255,0.4)" strokeWidth={1.5} strokeDasharray="4 5" />
-        </GFade>
         {/* demo messenger crossing */}
         {demo > 0 && demo < 1 && (
           <g>
-            <line x1={demoX} y1={dyTop + (dyBot - dyTop) * Math.max(0, demo - 0.12)} x2={demoX} y2={dyTop + (dyBot - dyTop) * demo} stroke={C.line} strokeWidth={3} opacity={0.5} strokeLinecap="round" />
-            <circle cx={demoX} cy={dyTop + (dyBot - dyTop) * demo - Math.sin(demo * Math.PI) * 22} r={12} fill={C.line} />
+            <line x1={siteX} y1={siteY + (membY - 42 - siteY) * Math.max(0, demo - 0.14)} x2={siteX} y2={siteY + (membY - 42 - siteY) * demo} stroke={C.line} strokeWidth={3} opacity={0.5} strokeLinecap="round" />
+            <circle cx={siteX} cy={siteY + (membY - 42 - siteY) * demo - Math.sin(demo * Math.PI) * 26} r={12} fill={C.line} />
           </g>
         )}
-        {/* three named messengers */}
         {named.map((d, i) => d.p > 0 && d.p < 1 && <circle key={i} cx={d.x} cy={d.y} r={11} fill={d.c} />)}
-        {/* flood with short motion trails */}
-        {flood.map((d, i) => d.p > 0 && (
-          <g key={i} opacity={d.p < 0.98 ? 0.95 : 0.55}>
-            <circle cx={d.x} cy={d.y} r={8} fill={DOT_COLORS[d.type]} />
-          </g>
-        ))}
-        {/* release arrow */}
-        <DrawPath at={tFlood} dur={10} d={`M150 ${termBottom - 40} L150 ${termBottom + 60}`} stroke={C.yellow} strokeWidth={4} />
-        <GPop at={tFlood + 7} cx={150} cy={termBottom + 60}>
-          <path d={`M150 ${termBottom + 60} L138 ${termBottom + 40} M150 ${termBottom + 60} L162 ${termBottom + 40}`} stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" />
-        </GPop>
+        {flood.map((d, i) => d.p > 0 && <circle key={i} cx={d.x} cy={d.y} r={8} fill={DOT_COLORS[d.type]} opacity={d.p < 0.98 ? 0.95 : 0.5} />)}
+        {/* release arrow near the site */}
+        <DrawPath at={tFlood} dur={10} d={`M150 ${siteY - 30} L150 ${siteY + 60}`} stroke={C.yellow} strokeWidth={4} />
+        <GPop at={tFlood + 7} cx={150} cy={siteY + 60}><path d={`M150 ${siteY + 60} L138 ${siteY + 40} M150 ${siteY + 60} L162 ${siteY + 40}`} stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" /></GPop>
         {/* reuptake transporter + block */}
-        <GFade at={tFlood - 6}><rect x={690} y={membY - 20} width={34} height={56} rx={10} fill="none" stroke={C.accent} strokeWidth={3} /></GFade>
-        <GPop at={tBlock} cx={707} cy={membY + 8}>
-          <circle cx={707} cy={membY + 8} r={34} fill="rgba(255,106,77,0.15)" stroke={C.danger} strokeWidth={4} />
-          <path d={`M693 ${membY - 6} L721 ${membY + 22} M721 ${membY - 6} L693 ${membY + 22}`} stroke={C.danger} strokeWidth={6} strokeLinecap="round" />
+        <GFade at={tFlood - 6}><rect x={700} y={membY - 24} width={34} height={56} rx={10} fill="none" stroke={C.accent} strokeWidth={3} /></GFade>
+        <GPop at={tBlock} cx={717} cy={membY + 4}>
+          <circle cx={717} cy={membY + 4} r={32} fill="rgba(255,106,77,0.15)" stroke={C.danger} strokeWidth={4} />
+          <path d={`M703 ${membY - 10} L731 ${membY + 18} M731 ${membY - 10} L703 ${membY + 18}`} stroke={C.danger} strokeWidth={6} strokeLinecap="round" />
         </GPop>
-        {/* boom glow across the gap */}
-        {boom > 0 && <rect x={200} y={termBottom + 40} width={520} height={membY - termBottom - 10} rx={20} fill={C.yellow} opacity={0.1 * boom * (0.5 + 0.5 * pulse)} />}
+        {/* boom glow filling the cleft */}
+        {boom > 0 && <rect x={200} y={siteY + 50} width={520} height={membY - siteY - 20} rx={20} fill={C.yellow} opacity={0.1 * boom * (0.5 + 0.5 * pulse)} />}
       </Svg>
-      <L x={20} y={30} at={2}><span style={kaText(26, 800, C.dim)}>ნეირონი</span></L>
-      <L x={20} y={membY + 70} at={8}><span style={kaText(26, 800, C.dim)}>მეორე ნეირონი</span></L>
-      <L x={56} y={termBottom + 60} at={2} center><span style={kaText(22, 700, "rgba(213,230,255,0.75)")}>სინაფსი</span></L>
-      <L x={70} y={termBottom - 30} at={tFlood + 2} center><span style={kaText(26, 800, C.yellow)}>გამოყოფა</span></L>
-      <L x={735} y={membY - 34} at={tBlock} style={{ textAlign: "left" }}>
-        <div style={kaText(24, 800, C.danger)}>უკუშეწოვა</div>
-        <div style={kaText(20, 700, C.danger)}>დაბლოკილია</div>
+      {/* anatomy labels */}
+      <Badge x={44} y={70} n="1" at={2} />
+      <L x={78} y={54} at={2}><span style={kaText(24, 800)}>გამგზავნი ნეირონი</span></L>
+      <Badge x={44} y={membY + 74} n="2" at={8} />
+      <L x={78} y={membY + 58} at={8}><span style={kaText(24, 800)}>მიმღები ნეირონი</span></L>
+      <L x={siteX + 40} y={siteY - 26} at={6}><span style={kaText(22, 700, C.yellow)}>გამოყოფის ადგილი</span></L>
+      <L x={70} y={siteY - 30} at={tFlood + 2} center><span style={kaText(24, 800, C.yellow)}>გამოყოფა</span></L>
+      <L x={745} y={membY - 42} at={tBlock} style={{ textAlign: "left" }}>
+        <div style={kaText(22, 800, C.danger)}>უკუშეწოვა</div>
+        <div style={kaText(19, 700, C.danger)}>დაბლოკილია</div>
       </L>
-      {/* legend builds as the three are named */}
       {NT.map((n, i) => (
-        <L key={i} x={[20, 290, 560][i]} y={membY + 170} at={types[i]}>
+        <L key={i} x={[20, 290, 560][i]} y={membY + 150} at={types[i]}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ width: 20, height: 20, borderRadius: 10, background: n.c, display: "inline-block", boxShadow: `0 0 10px ${n.c}` }} />
             <span style={kaText(26, 800)}>{n.name}</span>
           </div>
         </L>
       ))}
-      <Sticker at={tBoom} text="სიგნალი — ზედმეტად ძლიერი" style={{ left: 250, top: membY + 230 }} rotate={-2} />
+      <Sticker at={tBoom} text="სიგნალი — ზედმეტად ძლიერი" style={{ left: 250, top: membY + 210 }} rotate={-2} />
     </Stage>
   );
 };

@@ -4,7 +4,7 @@ export const config = {
   // Handle is kept here but hidden by default.
   handle: "@klon",
   showHandle: false,
-  slogan: "მეფედრონი · როგორ მოქმედებს",
+  slogan: "სასამართლო ისტორიები",
   avatar: "avatar.png",
   outroLine: "მეტი მარტივი ახსნა — ჩვენს არხზე",
   // Voice. tools/tts_eleven.py (ElevenLabs, current) reads `voice`;

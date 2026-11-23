@@ -1,13 +1,14 @@
 import React from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { config } from "../config";
-import { cue, sentenceStart, sentenceEnd } from "../timing";
+import { cue, sentenceStart } from "../timing";
 import { Appear, DrawPath, GFade, GPop, kaText, monoText, useRamp, usePop, useWave, CountUp, seeded } from "../components/anim";
-import { LAYOUT, Sticker } from "../components/chrome";
+import { LAYOUT, Sticker, DangerBlock } from "../components/chrome";
 
 const C = config.colors;
 export const W = 960;
 export const H = LAYOUT.stageHeight;
+const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 export const Stage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div style={{ position: "absolute", top: LAYOUT.stageTop, left: LAYOUT.side, width: W, height: H }}>{children}</div>
@@ -25,12 +26,6 @@ export const L: React.FC<{ x: number; y: number; at: number; children: React.Rea
   </Appear>
 );
 
-export const hex = (cx: number, cy: number, r: number) =>
-  Array.from({ length: 6 }, (_, i) => {
-    const a = (Math.PI / 3) * i - Math.PI / 2;
-    return `${i ? "L" : "M"}${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`;
-  }).join(" ") + " Z";
-
 export const chip = (color: string): React.CSSProperties => ({
   ...kaText(26, 800, color),
   border: `2px solid ${color}`,
@@ -39,277 +34,475 @@ export const chip = (color: string): React.CSSProperties => ({
   whiteSpace: "nowrap",
 });
 
-/* ---------------- 01 what is it ---------------- */
+export const card = (border = "rgba(213,230,255,0.35)"): React.CSSProperties => ({
+  position: "absolute",
+  border: `2px solid ${border}`,
+  borderRadius: 18,
+  padding: "18px 26px",
+  background: "rgba(8,18,44,0.8)",
+  boxShadow: "0 18px 50px rgba(2,8,24,0.6)",
+});
+
+/** Side-view car; (x, y) = ground under the middle of the car. */
+export const Car: React.FC<{ x: number; y: number; s?: number; lights?: number }> = ({ x, y, s = 1, lights = 0 }) => (
+  <g transform={`translate(${x} ${y}) scale(${s})`}>
+    {lights > 0 && <path d="M74 -20 L300 -58 L300 24 Z" fill={C.yellow} opacity={0.16 * lights} />}
+    <path
+      d="M-78 -14 L-78 -34 Q-76 -44 -58 -46 L-36 -70 Q-30 -76 -16 -76 L28 -76 Q40 -76 48 -68 L66 -46 Q80 -44 80 -30 L80 -14 Z"
+      fill="#0d1a3a" stroke={C.line} strokeWidth={3} strokeLinejoin="round"
+    />
+    <path d="M-28 -48 L-14 -66 L6 -66 L6 -48 Z M14 -48 L14 -66 L34 -66 L48 -48 Z" fill="rgba(52,227,220,0.18)" stroke={C.line} strokeWidth={2} />
+    <circle cx={-44} cy={-12} r={15} fill={C.bgBottom} stroke={C.line} strokeWidth={3} />
+    <circle cx={46} cy={-12} r={15} fill={C.bgBottom} stroke={C.line} strokeWidth={3} />
+    <rect x={72} y={-40} width={9} height={9} rx={2} fill={C.yellow} opacity={0.3 + 0.7 * lights} />
+    <rect x={-80} y={-40} width={6} height={9} rx={2} fill={C.danger} opacity={0.4 + 0.6 * lights} />
+  </g>
+);
+
+/* ---------------- 01 night prison, 01:30 ---------------- */
 export const S01: React.FC = () => {
   const id = "s01";
   const f = useCurrentFrame();
-  const tHex = cue(id, "სინთეზური");
-  const tCath = cue(id, "კათინონების");
-  const tRel = cue(id, "ნათესავი");
-  const tKhat = cue(id, "კატის");
-  const spin = f * 0.6;
-  const float = useWave(70) * 8;
+  const tHalf = cue(id, "ნახევარი");
+  const tCell = cue(id, "საკანს");
+  const tOpen = cue(id, "აღებენ");
+  const tPris = cue(id, "პატიმარს");
+  const tJacket = cue(id, "ქურთუკს");
+  const tCar = cue(id, "მანქანაში");
+  const tGo = cue(id, "სვამენ");
+
+  // clock: 01:29 ticks over to 01:30 on "ნახევარი"
+  const flip = interpolate(f, [tHalf, tHalf + 6], [0, 1], clamp);
+  const colon = Math.floor(f / 15) % 2 === 0 ? 1 : 0.25;
+  const clockIn = interpolate(f, [-4, 8], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.8)) });
+
+  // searchlight sweep
+  const beamA = (-118 + 26 * Math.sin(f / 38)) * (Math.PI / 180);
+  const bx = 742, by = 236;
+  const beam = (a: number, r: number) => `${bx + Math.cos(a) * r} ${by - Math.sin(a) * r * -1}`;
+  const b1 = beamA - 0.09, b2 = beamA + 0.09;
+
+  const cellLit = useRamp(tCell, 8);
+  const barsOpen = interpolate(f, [tOpen, tOpen + 12], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const inset = usePop(tPris, 200);
+  const carIn = interpolate(f, [tCar - 10, tCar + 6], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
+  const lights = useRamp(tGo, 6);
+  const drive = interpolate(f, [tGo + 8, tGo + 40], [0, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
+  const carX = 1180 - 330 * carIn + 520 * drive;
+  const shimmer = 0.6 + 0.4 * Math.sin(f / 9);
+  const jacketO = useRamp(tJacket, 8);
+  const jacketY = (1 - useRamp(tJacket, 10)) * -30;
+
+  const winCols = [170, 260, 350, 440, 530];
+  const winRows = [300, 380, 460];
+  const cell = { c: 2, r: 1 };
+
   return (
     <Stage>
-      {(() => {
-        // cold-open slam: title drops in big, then settles with a glitch tick
-        const s1 = interpolate(f, [0, 7], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
-        const s2 = interpolate(f, [5, 13], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.back(2)) });
-        const gx = f > 13 && f < 20 ? (f % 2 ? 4 : -4) : 0;
-        return (
-          <div style={{ position: "absolute", left: 0, top: 0 }}>
-            <div style={{ ...kaText(76, 900), opacity: s1, transform: `translateX(${(1 - s1) * -60}px)` }}>რა არის</div>
-            <div style={{ ...kaText(96, 900, C.accent), opacity: Math.min(1, s2 * 1.4), transform: `translateX(${gx}px) scale(${0.7 + 0.3 * s2})`, transformOrigin: "left center", textShadow: `0 0 ${26 * Math.min(1, s2)}px ${C.accent}55` }}>მეფედრონი?</div>
+      {/* digital clock */}
+      <div style={{ position: "absolute", left: 0, top: 0, opacity: clockIn, transform: `scale(${0.8 + 0.2 * clockIn})`, transformOrigin: "left top" }}>
+        <div style={{ ...card(C.yellow), position: "relative", padding: "10px 30px 14px", background: "rgba(10,16,36,0.92)", boxShadow: `0 0 40px ${C.yellow}33` }}>
+          <div style={{ fontFamily: config.fonts.mono, fontWeight: 700, fontSize: 132, color: C.yellow, letterSpacing: 2, lineHeight: 1, textShadow: `0 0 24px ${C.yellow}88`, display: "flex" }}>
+            <span>01</span>
+            <span style={{ opacity: colon }}>:</span>
+            <span style={{ position: "relative", display: "inline-block", width: 160, overflow: "hidden", height: 132 }}>
+              <span style={{ position: "absolute", left: 0, top: -132 * flip }}>29</span>
+              <span style={{ position: "absolute", left: 0, top: 132 - 132 * flip }}>30</span>
+            </span>
           </div>
-        );
-      })()}
+        </div>
+        <div style={{ ...monoText(24, C.dim), marginTop: 10 }}>14.12.2013 · ღამე</div>
+      </div>
+
       <Svg>
-        {/* orbiting molecule icon */}
-        <g transform={`translate(0 ${float})`}>
-          <GPop at={tHex} cx={700} cy={470}>
-            <path d={hex(700, 470, 112)} fill="none" stroke={C.accent} strokeWidth={5} />
-            <path d={hex(700, 470, 84)} fill="none" stroke={C.line} strokeWidth={2} opacity={0.3} />
-            <circle cx={700} cy={470} r={10} fill={C.accent} />
-          </GPop>
-          {[0, 1, 2].map((k) => {
-            const a = spin * (Math.PI / 180) + (k * Math.PI * 2) / 3;
+        {/* moon */}
+        <GFade at={0} dur={14}>
+          <circle cx={600} cy={50} r={30} fill="#e9eefc" opacity={0.85} />
+          <circle cx={614} cy={42} r={28} fill="#0b1d48" />
+        </GFade>
+        {/* searchlight beam */}
+        <path d={`M${bx} ${by} L${beam(b1, 900)} L${beam(b2, 900)} Z`} fill={C.yellow} opacity={0.07} />
+        {/* main block */}
+        <GFade at={0} dur={12}>
+          <rect x={120} y={260} width={500} height={300} fill="rgba(20,34,72,0.9)" stroke="rgba(213,230,255,0.35)" strokeWidth={2} />
+          <rect x={110} y={248} width={520} height={14} fill="rgba(213,230,255,0.25)" />
+        </GFade>
+        {winRows.map((y, r) =>
+          winCols.map((x, c) => {
+            const isCell = r === cell.r && c === cell.c;
+            const glow = isCell ? cellLit : 0.12 + 0.1 * seeded(r * 7 + c);
             return (
-              <g key={k} opacity={useRamp(tHex + 6 + k * 2, 8)}>
-                <circle cx={700 + Math.cos(a) * 150} cy={470 + Math.sin(a) * 90} r={7} fill={k ? C.yellow : C.accent} />
+              <g key={`${r}-${c}`}>
+                <rect x={x} y={y} width={50} height={58} rx={3} fill={isCell ? C.yellow : "#8fb3ff"} opacity={isCell ? 0.15 + 0.7 * glow * shimmer : glow} />
+                {[0, 1, 2, 3].map((k) => {
+                  const off = isCell ? (k < 2 ? -1 : 1) * barsOpen * 22 : 0;
+                  return <line key={k} x1={x + 10 + k * 10 + off} x2={x + 10 + k * 10 + off} y1={y} y2={y + 58} stroke="#0b1530" strokeWidth={4} />;
+                })}
               </g>
             );
-          })}
-        </g>
-        {/* khat branch grows */}
-        <DrawPath at={tRel} dur={18} d="M150 660 C160 560 170 470 205 360" />
-        <DrawPath at={tRel + 4} dur={14} d="M176 520 C110 500 82 450 94 400 C142 410 174 460 176 520 Z" stroke={C.accent} />
-        <DrawPath at={tRel + 8} dur={14} d="M190 450 C254 420 282 370 268 320 C217 336 192 390 190 450 Z" stroke={C.accent} />
-        <DrawPath at={tRel + 12} dur={14} d="M166 590 C224 580 262 540 264 500 C212 500 174 540 166 590 Z" stroke={C.accent} />
-        {/* relation arrow draws */}
-        <DrawPath at={tRel} dur={12} d="M320 470 L536 470" stroke={C.yellow} />
-        <GPop at={tRel + 10} cx={540} cy={470}>
-          <path d="M540 470 L518 457 M540 470 L518 483" stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" />
-        </GPop>
+          })
+        )}
+        {/* watchtower */}
+        <GFade at={2} dur={12}>
+          <rect x={712} y={250} width={60} height={310} fill="rgba(20,34,72,0.95)" stroke="rgba(213,230,255,0.35)" strokeWidth={2} />
+          <path d="M696 252 L788 252 L770 214 L714 214 Z" fill="rgba(20,34,72,1)" stroke="rgba(213,230,255,0.45)" strokeWidth={2} />
+          <circle cx={bx} cy={by} r={9} fill={C.yellow} />
+        </GFade>
+        {/* outer wall with razor wire */}
+        <GFade at={0} dur={10}>
+          <rect x={0} y={560} width={960} height={110} fill="rgba(14,26,58,0.97)" stroke="rgba(213,230,255,0.3)" strokeWidth={2} />
+          <path d={Array.from({ length: 33 }, (_, i) => `${i ? "L" : "M"}${i * 30} ${i % 2 ? 546 : 560}`).join(" ")} fill="none" stroke="rgba(213,230,255,0.45)" strokeWidth={2} />
+          <rect x={780} y={590} width={150} height={80} fill="#081430" stroke="rgba(213,230,255,0.4)" strokeWidth={2} />
+          {[0, 1, 2, 3, 4].map((k) => (
+            <line key={k} x1={795 + k * 30} x2={795 + k * 30} y1={590} y2={670} stroke="rgba(213,230,255,0.3)" strokeWidth={3} />
+          ))}
+        </GFade>
+        <line x1={0} x2={960} y1={740} y2={740} stroke="rgba(213,230,255,0.18)" strokeWidth={2} />
+        {/* car */}
+        {carIn > 0 && <Car x={carX} y={740} s={1} lights={lights} />}
+        {/* connector from lit cell to inset */}
+        {inset > 0.01 && (
+          <line x1={375} y1={409} x2={720} y2={200} stroke={C.yellow} strokeWidth={2} strokeDasharray="6 8" opacity={Math.min(1, inset)} />
+        )}
+        {/* inset: prisoner with own jacket over head */}
+        {inset > 0.01 && (
+          <g transform={`translate(820 160) scale(${inset})`}>
+            <circle cx={0} cy={0} r={118} fill="rgba(8,18,44,0.95)" stroke={C.yellow} strokeWidth={4} />
+            <g>
+              <path d="M-70 110 Q-72 40 0 34 Q72 40 70 110 Z" fill="#3a4b78" />
+              <g opacity={jacketO} transform={`translate(0 ${jacketY})`}>
+                <path d="M-56 52 Q-60 -44 0 -60 Q60 -44 56 52 Q28 40 0 44 Q-28 40 -56 52 Z" fill="#22355f" stroke={C.accent} strokeWidth={3} />
+                <line x1={0} y1={-50} x2={0} y2={44} stroke={C.accent} strokeWidth={2} strokeDasharray="4 5" />
+              </g>
+            </g>
+          </g>
+        )}
       </Svg>
-      <L x={428} y={410} at={tRel + 2} center><span style={kaText(24, 700, C.yellow)}>ქიმიური ნათესაობა</span></L>
-      <L x={178} y={688} at={tKhat} center style={{ textAlign: "center" }}>
-        <div style={kaText(32, 800)}>კატი</div>
-        <div style={monoText(20)}>Catha edulis</div>
-      </L>
-      <L x={700} y={600} at={tCath} center><span style={kaText(32, 800, C.accent)}>კათინონები</span></L>
-      <L x={700} y={448} at={tHex + 10} center><span style={kaText(24, 800)}>მეფედრონი</span></L>
-      <Sticker at={cue(id, "სტიმულატორია")} text="სინთეზური სტიმულატორი" style={{ left: 420, top: 250 }} rotate={-3} />
+      <L x={820} y={290} at={tJacket} center><span style={chip(C.accent)}>ქურთუკი თავზე</span></L>
+      <L x={250} y={600} at={tOpen}><span style={kaText(28, 800, C.yellow)}>საკანი იღება</span></L>
     </Stage>
   );
 };
 
-/* ---------------- 02 history ---------------- */
+/* ---------------- 02 who: former PM, December 2013 ---------------- */
 export const S02: React.FC = () => {
   const id = "s02";
   const f = useCurrentFrame();
-  const pts = [
-    { x: 130, at: cue(id, "1929"), year: 1929, text: ["პირველი", "აღწერა"] },
-    { x: 480, at: cue(id, "2007"), year: 2007, text: ["მოხმარების", "ცნობები"] },
-    { x: 830, at: cue(id, "2015"), year: 2015, text: ["გაერო:", "კონტროლი"] },
-  ];
-  const prog = interpolate(f, [cue(id, "1929"), cue(id, "2015") + 10], [0, 900], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
+  const tName = cue(id, "მერაბიშვილი");
+  const tFormer = cue(id, "ყოფილი");
+  const tDec = cue(id, "დეკემბერია");
+  const t2013 = cue(id, "2013");
+  const scan = (f * 4) % 300;
+  const ring = useRamp(t2013 + 8, 14);
   return (
     <Stage>
-      <Svg>
-        <line x1={30} x2={930} y1={360} y2={360} stroke="rgba(213,230,255,0.22)" strokeWidth={2} />
-        <line x1={30} x2={30 + prog} y1={360} y2={360} stroke={C.accent} strokeWidth={4} />
-        {Array.from({ length: 16 }, (_, i) => (
-          <line key={i} x1={30 + i * 60} x2={30 + i * 60} y1={372} y2={384} stroke="rgba(213,230,255,0.3)" strokeWidth={2} />
-        ))}
-        {/* moving marker head */}
-        <circle cx={30 + prog} cy={360} r={7} fill={C.accent} opacity={prog > 0 && prog < 900 ? 1 : 0} />
-        {pts.map((p, i) => (
-          <GPop key={i} at={p.at} cx={p.x} cy={360}>
-            <circle cx={p.x} cy={360} r={16} fill={C.bgBottom} stroke={C.yellow} strokeWidth={5} />
-            <circle cx={p.x} cy={360} r={6} fill={C.yellow} />
-          </GPop>
-        ))}
-      </Svg>
-      {pts.map((p, i) => (
-        <React.Fragment key={i}>
-          <L x={p.x} y={220} at={p.at} center>
-            <CountUp at={p.at} from={p.year - 12} to={p.year} dur={14} style={{ ...kaText(84, 900, C.yellow), letterSpacing: -1 }} />
-          </L>
-          <L x={p.x} y={420} at={p.at + 3} center style={{ textAlign: "center", width: 300 }}>
-            {p.text.map((t, k) => (<div key={k} style={kaText(28, 800, k ? C.text : C.dim)}>{t}</div>))}
-          </L>
-        </React.Fragment>
-      ))}
-      <Sticker at={cue(id, "კონტროლის")} text="2015 · გაეროს კონტროლი" style={{ left: 300, top: 600 }} rotate={-2} />
+      <Appear at={0} dy={20} style={{ ...card(C.accent), left: 0, top: 0, width: 960, height: 380, padding: 0, overflow: "hidden" }}>
+        <div style={{ position: "absolute", left: 30, top: 30, width: 250, height: 300, borderRadius: 12, border: `2px solid ${C.accent}`, background: "rgba(52,227,220,0.06)", overflow: "hidden" }}>
+          <svg width={250} height={300} viewBox="0 0 250 300">
+            <circle cx={125} cy={115} r={58} fill="#3a4b78" />
+            <path d="M20 300 Q22 200 125 188 Q228 200 230 300 Z" fill="#3a4b78" />
+            <line x1={0} x2={250} y1={scan} y2={scan} stroke={C.accent} strokeWidth={2} opacity={0.5} />
+          </svg>
+        </div>
+        <div style={{ position: "absolute", left: 310, top: 36, right: 30 }}>
+          <div style={monoText(22, C.dim)}>საქმე · Merabishvili v. Georgia</div>
+          <Appear at={tName - 4} dx={-20} dy={0}>
+            <div style={{ ...kaText(58, 900), marginTop: 10, lineHeight: 1.1 }}>ვანო</div>
+            <div style={{ ...kaText(64, 900, C.accent), lineHeight: 1.15, textShadow: `0 0 20px ${C.accent}44` }}>მერაბიშვილი</div>
+          </Appear>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, alignItems: "flex-start" }}>
+            <Appear at={tFormer} dx={-20} dy={0}><span style={chip(C.yellow)}>ყოფილი პრემიერ-მინისტრი</span></Appear>
+            <Appear at={tFormer + 10} dx={-20} dy={0}><span style={chip(C.line)}>2013 წლის მაისიდან — პატიმრობაში</span></Appear>
+          </div>
+        </div>
+      </Appear>
+      {/* calendar page */}
+      <Appear at={tDec} dy={24} style={{ ...card(C.yellow), left: 230, top: 430, width: 500, padding: 0, overflow: "hidden" }}>
+        <div style={{ background: C.yellow, padding: "8px 0 10px", textAlign: "center", ...kaText(34, 900, "#1a1400") }}>დეკემბერი</div>
+        <div style={{ padding: "16px 0 22px", textAlign: "center", position: "relative" }}>
+          <CountUp at={t2013} from={2001} to={2013} dur={14} style={{ ...kaText(120, 900), letterSpacing: -2, lineHeight: 1 }} />
+          <svg width={500} height={170} style={{ position: "absolute", left: 0, top: 0 }}>
+            <ellipse cx={250} cy={82} rx={200} ry={70} fill="none" stroke={C.danger} strokeWidth={5} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - ring} transform="rotate(-4 250 82)" />
+          </svg>
+        </div>
+      </Appear>
     </Stage>
   );
 };
 
-const DOT_COLORS = [C.accent, C.yellow, "#8FB3FF"];
+/* ---------------- 03 Tbilisi scheme: car route + the alleged deal ---------------- */
+const ROUTE: [number, number][] = [[140, 330], [140, 250], [470, 250], [470, 180], [660, 180], [660, 110], [800, 110]];
+const routeLen = ROUTE.slice(1).reduce((a, p, i) => a + Math.hypot(p[0] - ROUTE[i][0], p[1] - ROUTE[i][1]), 0);
+const routeAt = (p: number): [number, number] => {
+  let d = p * routeLen;
+  for (let i = 1; i < ROUTE.length; i++) {
+    const [x0, y0] = ROUTE[i - 1], [x1, y1] = ROUTE[i];
+    const seg = Math.hypot(x1 - x0, y1 - y0);
+    if (d <= seg) return [x0 + ((x1 - x0) * d) / seg, y0 + ((y1 - y0) * d) / seg];
+    d -= seg;
+  }
+  return ROUTE[ROUTE.length - 1];
+};
+const routeD = ROUTE.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
 
-/* ---------------- 03 brain / synapse ---------------- */
-const NT = [
-  { name: "დოფამინი", c: C.accent },
-  { name: "სეროტონინი", c: C.yellow },
-  { name: "ნორადრენალინი", c: "#8FB3FF" },
-];
-const Badge: React.FC<{ x: number; y: number; n: string; at: number }> = ({ x, y, n, at }) => (
-  <GPop at={at} cx={x} cy={y}>
-    <circle cx={x} cy={y} r={17} fill={C.accent} />
-    <text x={x} y={y + 7} textAnchor="middle" fill="#04202a" fontFamily={config.fonts.mono} fontWeight={700} fontSize={22}>{n}</text>
-  </GPop>
-);
 export const S03: React.FC = () => {
   const id = "s03";
   const f = useCurrentFrame();
-  const tTalk = cue(id, "ესაუბრებიან");
-  const tDa = cue(id, "დოფამინი");
-  const tSe = cue(id, "სეროტონინი");
-  const tNe = cue(id, "ნორადრენალინი");
-  const tFlood = cue(id, "ყრის");
-  const tBlock = cue(id, "ბლოკავს");
-  const tBoom = cue(id, "აფეთქება");
-  const types = [tDa, tSe, tNe];
-
-  const siteX = 480, siteY = 300;      // release site on the sender membrane
-  const membY = 476;                   // receiver membrane line
-  const recX = [320, 430, 540, 650];
-  const pBlock = usePop(tBlock, 240);
-  const boom = useRamp(tBoom, 10);
-  const pulse = 0.5 + 0.5 * Math.sin((f - tBoom) / 5);
-
-  // demo messenger crosses first
-  const demo = interpolate(f, [tTalk, tTalk + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
-  // three named messengers dock
-  const named = types.map((at, k) => {
-    const p = interpolate(f, [at, at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
-    return { p, x: siteX + (recX[k + 1] - siteX) * p, y: siteY + (membY - 42 - siteY) * p - Math.sin(p * Math.PI) * 30, c: NT[k].c };
-  });
-  // flood from the release site
-  const flood = Array.from({ length: 30 }, (_, i) => {
-    const at = tFlood + i * 0.8;
-    const p = interpolate(f, [at, at + 16], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.quad) });
-    const sx = siteX - 24 + seeded(i) * 48;
-    const ex = 300 + seeded(i + 99) * 360;
-    const ey = membY - 34 + seeded(i + 7) * 26 + Math.sin((f + i * 9) / 8) * 4;
-    const x = sx + (ex - sx) * p;
-    const y = siteY + (ey - siteY) * p - Math.sin(p * Math.PI) * 36;
-    return { type: i % 3, p, x, y };
-  });
-  const burst = usePop(tFlood, 200);
-
+  const tBring = cue(id, "მიიყვანენ");
+  const tDeal = cue(id, "გარიგებას");
+  const tInfo = cue(id, "ინფორმაცია");
+  const tZh = cue(id, "ჟვანიას");
+  const tSa = cue(id, "სააკაშვილის");
+  const tLeave = cue(id, "სანაცვლოდ");
+  const tGo = cue(id, "ქვეყნიდან");
+  const drive = interpolate(f, [4, tBring + 8], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
+  const [cx, cy] = routeAt(drive);
+  const arrive = usePop(tBring + 8, 220);
+  const swap = useWave(40);
   return (
     <Stage>
       <Svg>
-        {/* sender neuron terminal (top bulb) */}
-        <DrawPath at={0} dur={14} d={`M250 -10 C250 110 250 180 250 ${siteY - 20} C250 ${siteY + 24} 340 ${siteY + 40} 480 ${siteY + 40} C620 ${siteY + 40} 710 ${siteY + 24} 710 ${siteY - 20} C710 180 710 110 710 -10`} fill="rgba(52,227,220,0.04)" />
-        {/* receiver neuron surface (bottom) */}
-        <DrawPath at={6} dur={16} d={`M120 ${membY + 60} C320 ${membY + 6} 640 ${membY + 6} 840 ${membY + 60}`} />
-        {/* cleft callout + flow arrow */}
-        <GFade at={2}>
-          <path d={`M470 ${siteY + 60} C460 ${siteY + 110} 460 ${membY - 70} 470 ${membY - 20}`} fill="none" stroke="rgba(213,230,255,0.35)" strokeWidth={2} strokeDasharray="4 6" />
-          <path d={`M470 ${membY - 20} l-10 -16 m10 16 l10 -16`} fill="none" stroke="rgba(213,230,255,0.5)" strokeWidth={2} strokeLinecap="round" />
+        <defs>
+          <clipPath id="tbsMap"><rect x={0} y={0} width={960} height={410} rx={18} /></clipPath>
+        </defs>
+        <GFade at={0} dur={10}>
+          <rect x={0} y={0} width={960} height={410} rx={18} fill="rgba(8,18,44,0.75)" stroke="rgba(213,230,255,0.3)" strokeWidth={2} />
         </GFade>
-        {/* release site (vesicle) */}
-        <GPop at={6} cx={siteX} cy={siteY}>
-          <circle cx={siteX} cy={siteY} r={24} fill="none" stroke={C.yellow} strokeWidth={3} />
-          <circle cx={siteX} cy={siteY} r={12} fill={C.yellow} opacity={0.35 + 0.45 * burst} />
+        <g clipPath="url(#tbsMap)">
+          {/* street grid */}
+          {Array.from({ length: 12 }, (_, i) => (
+            <line key={`v${i}`} x1={40 + i * 80 + (i % 3) * 7} x2={20 + i * 80} y1={0} y2={410} stroke="rgba(213,230,255,0.07)" strokeWidth={6} />
+          ))}
+          {Array.from({ length: 6 }, (_, i) => (
+            <line key={`h${i}`} x1={0} x2={960} y1={40 + i * 70} y2={30 + i * 72} stroke="rgba(213,230,255,0.07)" strokeWidth={6} />
+          ))}
+          {/* Mtkvari */}
+          <DrawPath at={0} dur={18} d="M250 -20 C330 90 260 170 360 230 C450 285 560 280 610 340 C650 390 700 410 720 440" stroke="#2f6bd0" strokeWidth={26} opacity={0.55} />
+          {/* route */}
+          <path d={routeD} fill="none" stroke="rgba(247,208,70,0.25)" strokeWidth={6} strokeDasharray="2 12" strokeLinecap="round" />
+          <path d={routeD} fill="none" stroke={C.yellow} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drive} />
+        </g>
+        {/* points */}
+        <GPop at={2} cx={140} cy={330}>
+          <circle cx={140} cy={330} r={18} fill={C.bgBottom} stroke={C.line} strokeWidth={4} />
+          <rect x={131} y={321} width={18} height={18} fill="none" stroke={C.line} strokeWidth={2} />
         </GPop>
-        {/* receptors as docking slots */}
-        {recX.map((x, i) => {
-          const lit = i === 0 ? demo : named[i - 1]?.p ?? 0;
-          const litAll = Math.max(lit, boom);
-          const col = i === 0 ? C.line : NT[Math.min(i - 1, 2)].c;
-          return (
-            <g key={i}>
-              <DrawPath at={10 + i * 2} dur={10} d={`M${x - 20} ${membY + 4} L${x - 20} ${membY - 14} L${x - 7} ${membY - 14} L${x - 7} ${membY - 2} L${x + 7} ${membY - 2} L${x + 7} ${membY - 14} L${x + 20} ${membY - 14} L${x + 20} ${membY + 4}`} stroke={C.accent} strokeWidth={3} />
-              <rect x={x - 28} y={membY - 12} width={56} height={44} rx={8} fill={col} opacity={0.5 * litAll * (0.6 + 0.4 * pulse)} />
-            </g>
-          );
-        })}
-        {/* demo messenger crossing */}
-        {demo > 0 && demo < 1 && (
+        <GPop at={tBring} cx={800} cy={110}>
+          <circle cx={800} cy={110} r={22} fill={C.bgBottom} stroke={C.danger} strokeWidth={5} />
+          <circle cx={800} cy={110} r={8} fill={C.danger} />
+        </GPop>
+        {arrive > 0.01 && <circle cx={800} cy={110} r={22 + 40 * arrive} fill="none" stroke={C.danger} strokeWidth={3} opacity={Math.max(0, 1 - arrive)} />}
+        {/* moving car marker */}
+        {drive > 0 && (
           <g>
-            <line x1={siteX} y1={siteY + (membY - 42 - siteY) * Math.max(0, demo - 0.14)} x2={siteX} y2={siteY + (membY - 42 - siteY) * demo} stroke={C.line} strokeWidth={3} opacity={0.5} strokeLinecap="round" />
-            <circle cx={siteX} cy={siteY + (membY - 42 - siteY) * demo - Math.sin(demo * Math.PI) * 26} r={12} fill={C.line} />
+            <circle cx={cx} cy={cy} r={26} fill={C.yellow} opacity={0.18} />
+            <circle cx={cx} cy={cy} r={12} fill={C.yellow} />
           </g>
         )}
-        {named.map((d, i) => d.p > 0 && d.p < 1 && <circle key={i} cx={d.x} cy={d.y} r={11} fill={d.c} />)}
-        {flood.map((d, i) => d.p > 0 && <circle key={i} cx={d.x} cy={d.y} r={8} fill={DOT_COLORS[d.type]} opacity={d.p < 0.98 ? 0.95 : 0.5} />)}
-        {/* release arrow near the site */}
-        <DrawPath at={tFlood} dur={10} d={`M150 ${siteY - 30} L150 ${siteY + 60}`} stroke={C.yellow} strokeWidth={4} />
-        <GPop at={tFlood + 7} cx={150} cy={siteY + 60}><path d={`M150 ${siteY + 60} L138 ${siteY + 40} M150 ${siteY + 60} L162 ${siteY + 40}`} stroke={C.yellow} strokeWidth={4} strokeLinecap="round" fill="none" /></GPop>
-        {/* reuptake transporter + block */}
-        <GFade at={tFlood - 6}><rect x={700} y={membY - 24} width={34} height={56} rx={10} fill="none" stroke={C.accent} strokeWidth={3} /></GFade>
-        <GPop at={tBlock} cx={717} cy={membY + 4}>
-          <circle cx={717} cy={membY + 4} r={32} fill="rgba(255,106,77,0.15)" stroke={C.danger} strokeWidth={4} />
-          <path d={`M703 ${membY - 10} L731 ${membY + 18} M731 ${membY - 10} L703 ${membY + 18}`} stroke={C.danger} strokeWidth={6} strokeLinecap="round" />
-        </GPop>
-        {/* boom glow filling the cleft */}
-        {boom > 0 && <rect x={200} y={siteY + 50} width={520} height={membY - siteY - 20} rx={20} fill={C.yellow} opacity={0.1 * boom * (0.5 + 0.5 * pulse)} />}
       </Svg>
-      {/* anatomy labels */}
-      <Badge x={44} y={70} n="1" at={2} />
-      <L x={78} y={54} at={2}><span style={kaText(24, 800)}>გამგზავნი ნეირონი</span></L>
-      <Badge x={44} y={membY + 74} n="2" at={8} />
-      <L x={78} y={membY + 58} at={8}><span style={kaText(24, 800)}>მიმღები ნეირონი</span></L>
-      <L x={siteX + 40} y={siteY - 26} at={6}><span style={kaText(22, 700, C.yellow)}>გამოყოფის ადგილი</span></L>
-      <L x={70} y={siteY - 30} at={tFlood + 2} center><span style={kaText(24, 800, C.yellow)}>გამოყოფა</span></L>
-      <L x={745} y={membY - 42} at={tBlock} style={{ textAlign: "left" }}>
-        <div style={kaText(22, 800, C.danger)}>უკუშეწოვა</div>
-        <div style={kaText(19, 700, C.danger)}>დაბლოკილია</div>
+      <L x={20} y={18} at={0}><span style={{ ...kaText(22, 700, C.dim), border: `2px solid ${C.dim}`, borderRadius: 6, padding: "2px 10px" }}>თბილისი · სქემა</span></L>
+      <L x={720} y={340} at={4}><span style={{ ...kaText(22, 700, "#7aa6f0"), fontStyle: "italic" }}>მტკვარი</span></L>
+      <L x={140} y={356} at={2} center><span style={kaText(26, 800)}>ციხე</span></L>
+      <L x={800} y={140} at={tBring} center style={{ textAlign: "center" }}>
+        <div style={kaText(26, 800, C.danger)}>მთავარი</div>
+        <div style={kaText(26, 800, C.danger)}>პროკურორი</div>
       </L>
-      {NT.map((n, i) => (
-        <L key={i} x={[20, 290, 560][i]} y={membY + 150} at={types[i]}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ width: 20, height: 20, borderRadius: 10, background: n.c, display: "inline-block", boxShadow: `0 0 10px ${n.c}` }} />
-            <span style={kaText(26, 800)}>{n.name}</span>
-          </div>
-        </L>
-      ))}
-      <Sticker at={tBoom} text="სიგნალი — ზედმეტად ძლიერი" style={{ left: 250, top: membY + 210 }} rotate={-2} />
+      <L x={250} y={190} at={8}><span style={monoText(24, C.yellow)}>01:30 →</span></L>
+
+      {/* the alleged deal */}
+      <L x={0} y={438} at={tDeal}><span style={chip(C.dim)}>მისი თქმით · შეთავაზება</span></L>
+      <Appear at={tInfo} dy={20} style={{ ...card(C.accent), left: 0, top: 500, width: 420, minHeight: 230 }}>
+        <div style={kaText(26, 700, C.dim)}>მოითხოვენ</div>
+        <div style={kaText(40, 900, C.accent)}>ინფორმაციას</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14, alignItems: "flex-start" }}>
+          <Appear at={tZh} dx={-16} dy={0}><span style={chip(C.yellow)}>ჟვანიას სიკვდილზე</span></Appear>
+          <Appear at={tSa} dx={-16} dy={0}><span style={chip(C.yellow)}>სააკაშვილის ანგარიშებზე</span></Appear>
+        </div>
+      </Appear>
+      <L x={480} y={575} at={tLeave} center>
+        <svg width={70} height={70} viewBox="0 0 70 70" style={{ transform: `translateX(${swap * 4}px)` }}>
+          <path d="M8 24 H58 M46 12 L58 24 L46 36" fill="none" stroke={C.yellow} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M62 48 H12 M24 36 L12 48 L24 60" fill="none" stroke={C.yellow} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </L>
+      <Appear at={tLeave} dy={20} style={{ ...card(C.yellow), left: 540, top: 500, width: 420, minHeight: 230 }}>
+        <div style={kaText(26, 700, C.dim)}>სანაცვლოდ</div>
+        <div style={kaText(40, 900, C.yellow)}>ქვეყნიდან</div>
+        <div style={kaText(40, 900, C.yellow)}>წასვლა</div>
+        <Appear at={tGo} dy={0} dx={30} style={{ marginTop: 10 }}>
+          <svg width={120} height={44} viewBox="0 0 120 44">
+            <path d="M6 30 L92 30 L110 16 M92 30 L76 40" fill="none" stroke={C.yellow} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M40 30 L60 8 L70 8 L60 30" fill={C.yellow} />
+          </svg>
+        </Appear>
+      </Appear>
+      <Sticker at={tDeal} text="გარიგება?" style={{ left: 640, top: 432 }} rotate={4} color={C.danger} />
     </Stage>
   );
 };
 
-/* ---------------- 04 why it pulls ---------------- */
+/* ---------------- 04 TV: live from the courtroom ---------------- */
 export const S04: React.FC = () => {
   const id = "s04";
   const f = useCurrentFrame();
-  const t0 = cue(id, "ეფექტი");
-  const tFall = cue(id, "ქრება");
-  const tWant = cue(id, "სურვილი");
-  const tRep = cue(id, "განმეორებითი");
-  const tDays = cue(id, "რამდენიმე");
-  const tRow = cue(id, "ზედიზედ");
-  const base = 520;
-  const wave = (x0: number) =>
-    `M${x0} ${base} C${x0 + 36} ${base} ${x0 + 46} 170 ${x0 + 92} 170 C${x0 + 138} 170 ${x0 + 148} ${base + 50} ${x0 + 208} ${base + 50} L${x0 + 250} ${base + 50}`;
-  // dot riding the first wave
-  const ride = interpolate(f, [t0, tFall], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const rx = 80 + ride * 250;
-  const ry = base - Math.sin(Math.min(ride, 0.5) / 0.5 * Math.PI) * (base - 170) * (ride < 0.5 ? 1 : 0) - (ride >= 0.5 ? (1 - Math.cos((ride - 0.5) / 0.5 * Math.PI)) * 0 : 0);
+  const tCourt = cue(id, "სასამართლოში");
+  const tLive = cue(id, "პირდაპირ");
+  const tTell = cue(id, "ყვება");
+  const tGov = cue(id, "ხელისუფლება");
+  const tLie = cue(id, "აბსოლუტური");
+  // CRT power-on: a line, then the picture opens up
+  const on = interpolate(f, [2, 12], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
+  const blink = Math.floor(f / 12) % 2 === 0 ? 1 : 0.35;
+  const talk = f > tTell - 10 ? 0.5 + 0.5 * Math.sin(f / 3) : 0;
+  const ticker = "პირდაპირი ტრანსლაცია · სასამართლო სხდომა · ვანო მერაბიშვილი · ";
+  const tickX = -((f * 4) % 900);
+  const sx = 110, sy = 50, sw = 740, sh = 440;
+  return (
+    <Stage>
+      <L x={0} y={-6} at={0}><span style={chip(C.yellow)}>3 დღის შემდეგ</span></L>
+      <Svg>
+        <GFade at={0} dur={8}>
+          <rect x={80} y={20} width={800} height={500} rx={28} fill="#0a1430" stroke="rgba(213,230,255,0.5)" strokeWidth={4} />
+          <path d="M420 520 L400 570 L560 570 L540 520 Z" fill="#0a1430" stroke="rgba(213,230,255,0.4)" strokeWidth={3} />
+        </GFade>
+        <defs>
+          <clipPath id="tvScreen"><rect x={sx} y={sy} width={sw} height={sh} rx={14} /></clipPath>
+        </defs>
+        <g clipPath="url(#tvScreen)">
+          <rect x={sx} y={sy} width={sw} height={sh} fill="#050a18" />
+          <g transform={`translate(0 ${(sy + sh / 2) * (1 - on)}) scale(1 ${Math.max(0.004, on)})`}>
+            {/* courtroom */}
+            <rect x={sx} y={sy} width={sw} height={sh} fill="#1a2b55" />
+            <rect x={sx} y={sy + 300} width={sw} height={140} fill="#142247" />
+            <rect x={300} y={140} width={360} height={110} fill="#3b2a1c" stroke="#6b4c30" strokeWidth={3} />
+            <circle cx={480} cy={100} r={34} fill="none" stroke={C.yellow} strokeWidth={4} opacity={0.7} />
+            {[360, 480, 600].map((x, i) => (
+              <g key={i}>
+                <circle cx={x} cy={124} r={20} fill="#0c1430" />
+                <rect x={x - 30} y={140} width={60} height={30} rx={8} fill="#0c1430" />
+              </g>
+            ))}
+            {/* speaker at the stand */}
+            <circle cx={480} cy={318} r={34} fill="#0b1226" />
+            <path d="M420 440 Q422 360 480 352 Q538 360 540 440 Z" fill="#0b1226" />
+            <rect x={430} y={380} width={100} height={70} fill="#4a3522" stroke="#6b4c30" strokeWidth={3} />
+            {[0, 1, 2].map((k) => (
+              <path key={k} d={`M${530 + k * 18} 300 q12 18 0 36`} fill="none" stroke={C.accent} strokeWidth={3} opacity={talk * (1 - k * 0.25)} />
+            ))}
+            {/* lower third */}
+            <rect x={sx} y={sy + sh - 70} width={sw} height={70} fill="rgba(4,10,28,0.85)" />
+            <rect x={sx} y={sy + sh - 70} width={200} height={70} fill={C.danger} />
+          </g>
+          {/* scanlines */}
+          {Array.from({ length: 44 }, (_, i) => (
+            <rect key={i} x={sx} y={sy + i * 10} width={sw} height={3} fill="#000" opacity={0.12} />
+          ))}
+        </g>
+      </Svg>
+      {/* text inside the screen (HTML for Georgian shaping) */}
+      <div style={{ position: "absolute", left: sx, top: sy, width: sw, height: sh, overflow: "hidden", borderRadius: 14, opacity: on }}>
+        <div style={{ position: "absolute", left: 0, top: sh - 70, width: 200, height: 70, display: "flex", alignItems: "center", justifyContent: "center", ...kaText(24, 900) }}>სასამართლო</div>
+        <div style={{ position: "absolute", left: 214, right: 0, top: sh - 64, height: 60, overflow: "hidden" }}>
+          <div style={{ whiteSpace: "nowrap", transform: `translateX(${tickX}px)`, ...kaText(28, 800) }}>
+            {ticker}{ticker}{ticker}
+          </div>
+        </div>
+      </div>
+      <Appear at={tLive} dx={-20} dy={0} style={{ position: "absolute", left: sx + 20, top: sy + 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: C.danger, borderRadius: 8, padding: "4px 14px 6px", boxShadow: `0 0 24px ${C.danger}88` }}>
+          <span style={{ width: 16, height: 16, borderRadius: 8, background: "#fff", opacity: blink, display: "inline-block" }} />
+          <span style={kaText(28, 900)}>პირდაპირი ეთერი</span>
+        </div>
+      </Appear>
+      <L x={sx + sw - 20} y={sy + 22} at={tCourt} style={{ transform: "translateX(-100%)" }}><span style={monoText(24, "#fff")}>LIVE</span></L>
+      {/* government response */}
+      <Appear at={tGov} dy={20} style={{ position: "absolute", left: 0, top: 610, display: "flex", alignItems: "center", gap: 20 }}>
+        <span style={chip(C.line)}>ხელისუფლება:</span>
+      </Appear>
+      <DangerBlock at={tLie} style={{ left: 280, top: 594, padding: "10px 26px 14px" }}>
+        <span style={kaText(46, 900, C.danger)}>„აბსოლუტური ტყუილია“</span>
+      </DangerBlock>
+    </Stage>
+  );
+};
+
+/* ---------------- 05 CCTV + 24 hours vs 1 month ---------------- */
+export const S05: React.FC = () => {
+  const id = "s05";
+  const f = useCurrentFrame();
+  const tRec = cue(id, "კამერების");
+  const tGov = sentenceStart(id, 1);
+  const tOnly = cue(id, "მხოლოდ");
+  const tDel = cue(id, "იშლება");
+  const tTest = cue(id, "ჩვენება");
+  const tMonth = cue(id, "ერთი");
+  const tKept = cue(id, "ინახებოდა");
+  const swing = Math.sin(f / 30) * 12;
+  const blink = Math.floor(f / 12) % 2 === 0;
+  const BAR = 900;
+  const day = BAR / 30;
+  const fill1 = useRamp(tOnly, 10);
+  const erase = interpolate(f, [tDel, tDel + 18], [0, 1], clamp);
+  const fill2 = interpolate(f, [tMonth, tMonth + 22], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const recOn = f >= tRec;
   return (
     <Stage>
       <Svg>
-        <DrawPath at={0} dur={12} d={`M70 120 L70 ${base + 90} L930 ${base + 90}`} stroke="rgba(213,230,255,0.55)" strokeWidth={2.5} />
-        <line x1={70} x2={930} y1={base} y2={base} stroke="rgba(213,230,255,0.2)" strokeWidth={2} strokeDasharray="6 8" />
-        <GPop at={tWant} cx={315} cy={base + 44}>
-          <rect x={280} y={base + 6} width={70} height={76} rx={8} fill="rgba(255,106,77,0.25)" />
-        </GPop>
-        <DrawPath at={t0} dur={Math.max(16, tFall - t0 + 10)} d={wave(80)} stroke={C.accent} strokeWidth={6} />
-        <DrawPath at={tRep} dur={18} d={wave(330)} stroke={C.accent} strokeWidth={6} opacity={0.85} />
-        <DrawPath at={tDays} dur={18} d={wave(580)} stroke={C.accent} strokeWidth={6} opacity={0.7} />
-        {ride > 0 && ride < 1 && <circle cx={rx} cy={ry} r={10} fill={C.yellow} />}
+        {/* wall mount + camera */}
+        <GFade at={0} dur={10}>
+          <rect x={20} y={20} width={20} height={110} rx={4} fill="#1a2b55" stroke="rgba(213,230,255,0.4)" strokeWidth={2} />
+          <line x1={40} y1={70} x2={100} y2={70} stroke="rgba(213,230,255,0.5)" strokeWidth={6} />
+        </GFade>
+        <g transform={`rotate(${swing} 100 70)`}>
+          <GPop at={0} cx={100} cy={70}>
+            <path d="M100 70 L520 -10 L520 210 Z" fill={C.accent} opacity={recOn ? 0.07 : 0.03} />
+            <rect x={90} y={40} width={170} height={64} rx={14} fill="#1a2b55" stroke={C.line} strokeWidth={3} />
+            <rect x={258} y={50} width={30} height={44} rx={6} fill="#0b1530" stroke={C.line} strokeWidth={3} />
+            <circle cx={274} cy={72} r={11} fill={C.accent} opacity={0.6} />
+            <circle cx={120} cy={56} r={6} fill={C.danger} opacity={recOn && blink ? 1 : 0.2} />
+          </GPop>
+        </g>
       </Svg>
-      <L x={84} y={84} at={0}><span style={kaText(26, 800, C.dim)}>ეფექტი</span></L>
-      <L x={840} y={base + 100} at={0}><span style={kaText(26, 800, C.dim)}>დრო</span></L>
-      <L x={200} y={76} at={0}><span style={{ ...kaText(22, 700, C.dim), border: `2px solid ${C.dim}`, borderRadius: 6, padding: "2px 10px" }}>სქემა</span></L>
-      <L x={315} y={base + 100} at={tWant} center><span style={kaText(28, 800, C.danger)}>სურვილი</span></L>
-      <L x={205} y={base + 150} at={tDays} center><span style={chip(C.yellow)}>დღე 1</span></L>
-      <L x={455} y={base + 150} at={tDays + 4} center><span style={chip(C.yellow)}>დღე 2</span></L>
-      <L x={705} y={base + 150} at={tRow} center><span style={chip(C.danger)}>დღე 3</span></L>
-      <Sticker at={tFall} text="სწრაფად მოდის — სწრაფად მიდის" style={{ left: 250, top: 735 }} rotate={-2} />
+      <Appear at={tRec} dx={30} dy={0} style={{ ...card(), left: 560, top: 10, width: 400, padding: "14px 22px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ width: 18, height: 18, borderRadius: 9, background: C.danger, opacity: blink ? 1 : 0.3, display: "inline-block" }} />
+          <span style={monoText(30, C.text)}>REC 01:30</span>
+        </div>
+        <div style={{ ...kaText(28, 800), marginTop: 6 }}>ციხის კამერების ჩანაწერი</div>
+        <div style={kaText(24, 700, C.yellow)}>მთავარი მტკიცებულება</div>
+      </Appear>
+
+      {/* bar 1: official version */}
+      <Appear at={tGov} dy={18} style={{ position: "absolute", left: 0, top: 290, width: BAR }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <span style={kaText(26, 700, C.dim)}>ხელისუფლების ვერსია</span>
+          <span style={kaText(56, 900, erase > 0.5 ? C.danger : C.yellow)}>24 საათი</span>
+        </div>
+        <div style={{ position: "relative", height: 44, marginTop: 8, borderRadius: 8, background: "rgba(140,165,220,0.12)", border: "2px solid rgba(213,230,255,0.25)" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: day * fill1, borderRadius: 6, background: C.yellow, opacity: 1 - erase * 0.85, boxShadow: `0 0 18px ${C.yellow}88` }} />
+          {erase > 0 && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: day, borderRadius: 6, border: `2px dashed ${C.danger}` }} />}
+        </div>
+      </Appear>
+      <L x={60} y={430} at={tDel}><span style={chip(C.danger)}>✕ თავისით იშლება</span></L>
+
+      {/* bar 2: testimony */}
+      <Appear at={tTest} dy={18} style={{ position: "absolute", left: 0, top: 520, width: BAR }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <span style={kaText(26, 700, C.dim)}>ჩვენება საქმეში</span>
+          <span style={kaText(56, 900, C.accent)}>1 თვე</span>
+        </div>
+        <div style={{ position: "relative", height: 44, marginTop: 8, borderRadius: 8, background: "rgba(140,165,220,0.12)", border: "2px solid rgba(213,230,255,0.25)", overflow: "hidden" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: BAR * fill2, background: C.accent, boxShadow: `0 0 18px ${C.accent}88` }} />
+          {Array.from({ length: 29 }, (_, i) => (
+            <div key={i} style={{ position: "absolute", left: (i + 1) * day, top: 0, bottom: 0, width: 2, background: "rgba(4,11,32,0.45)" }} />
+          ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+          <span style={monoText(20)}>დღე 1</span>
+          <span style={monoText(20)}>დღე 30</span>
+        </div>
+      </Appear>
+      <Sticker at={tKept} text="30-ჯერ მეტი" style={{ left: 560, top: 690 }} rotate={-3} />
     </Stage>
   );
 };

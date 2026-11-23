@@ -1,22 +1,37 @@
-# Reel: «რა არის მეფედრონი» (Remotion)
+# Reel: «მერაბიშვილი საქართველოს წინააღმდეგ» (Remotion)
 
-Vertical 1080×1920, 30 fps Georgian reel. All scene timing comes from `data/timings.json`.
+Vertical 1080×1920, 30 fps Georgian reel about the ECtHR Grand Chamber judgment
+*Merabishvili v. Georgia* (28.11.2017). Same look and components as `../video/`.
+Every animation is cued to words in `data/timings.json` (via `cue()` in `src/timing.ts`).
+
+## Scenes
+| # | file | picture |
+|---|------|---------|
+| 01 | scenes1.tsx `S01` | night prison, clock 01:29 → 01:30, cell opens, jacket over the head, car drives off |
+| 02 | `S02` | case card (silhouette, no photo), "former PM", calendar December 2013 |
+| 03 | `S03` | Tbilisi scheme (Mtkvari, streets), car route prison → chief prosecutor; the alleged deal |
+| 04 | `S04` | TV, courtroom live broadcast, ticker; government: "absolute lie" |
+| 05 | `S05` | CCTV camera, REC 01:30; bars "24 hours" vs "1 month" (to scale, 1:30) |
+| 06 | scenes2.tsx `S06` | Europe map (Natural Earth), flight Tbilisi → Strasbourg, ECHR; Article 18 card |
+| 07 | `S07` | official purpose vs hidden purpose, proof meter stuck at ~7% |
+| 08 | `S08` | "direct evidence not required", mosaic of facts, stamp "night story confirmed" |
+| 09 | `S09` | lawful detention → path turns to "obtaining information" |
+| 10 | `S10` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
 
 ## Files
-- `src/config.ts` — channel name, handle (hidden by default), slogan, colours, fonts, voice, Instagram safe zones.
-- `data/script.json` — narration text per scene (header tag, section label, sentences).
-- `data/keywords.json` — subtitle words coloured by accent / yellow / danger.
-- `tools/tts.py` — edge-tts voiceover → `public/voice.wav` + `data/timings.json`.
-- `src/scenes/` — hand-drawn SVG/CSS scenes. Animations are cued to the words in `timings.json`.
+- `src/config.ts` — channel, colours, fonts, voice, safe zones.
+- `data/script.json` — narration per scene; `data/timings.json` — word timings (ElevenLabs).
+- `data/keywords.json` — subtitle words coloured accent / yellow / danger.
+- `data/europe.json` — Europe country outlines for scene 06, projected from Natural Earth 1:50m
+  (`world-atlas@2.0.2`, public domain), equirectangular lon −11…50, lat 34…61.
+- `public/mix.wav` — voice + music/SFX mix used by the reel.
 
 ## Build
 ```bash
-cd video
+cd video-merab
 npm ci
-pip install edge-tts numpy
-python3 tools/tts.py            # needs network access to speech.platform.bing.com
-npx remotion studio src/index.ts  # preview
-npx remotion render src/index.ts Reel ../output/raw.mp4   # add --browser-executable=... if Chrome cannot be downloaded
+npx remotion studio src/index.ts                       # preview
+npx remotion render src/index.ts Reel ../output/raw.mp4 # add --browser-executable=... if Chrome cannot be downloaded
 ffmpeg -i ../output/raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" \
-  -c:v libx264 -profile:v high -crf 18 -movflags +faststart -c:a copy ../output/mephedrone_ka.mp4
+  -c:v libx264 -profile:v high -crf 18 -movflags +faststart -c:a copy ../output/merabishvili_ka.mp4
 ```

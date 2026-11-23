@@ -1,0 +1,6 @@
+node_modules/
+video/.tts_cache/
+video/out/
+__pycache__/
+video-merab/node_modules
+video-merab/.tts_cache/

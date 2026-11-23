@@ -1,5 +1,5 @@
 import React from "react";
-import { useCurrentFrame, interpolate, Easing } from "remotion";
+import { useCurrentFrame, interpolate, Easing, Img, staticFile } from "remotion";
 import { config } from "../config";
 import { cue, sentenceStart } from "../timing";
 import { Appear, DrawPath, GFade, GPop, kaText, monoText, useRamp, usePop, useWave, CountUp, seeded } from "../components/anim";
@@ -42,6 +42,16 @@ export const card = (border = "rgba(213,230,255,0.35)"): React.CSSProperties => 
   background: "rgba(8,18,44,0.8)",
   boxShadow: "0 18px 50px rgba(2,8,24,0.6)",
 });
+
+/** Round or square photo with accent frame and a small credit line. */
+export const Photo: React.FC<{ src: string; size: number; round?: boolean; color?: string; credit?: string; style?: React.CSSProperties }> = ({
+  src, size, round = true, color = C.accent, credit, style,
+}) => (
+  <div style={{ position: "relative", width: size, ...style }}>
+    <Img src={staticFile(`photos/${src}`)} style={{ width: size, height: size, objectFit: "cover", borderRadius: round ? size / 2 : 12, border: `4px solid ${color}`, boxShadow: `0 0 24px ${color}55`, display: "block" }} />
+    {credit ? <div style={{ ...monoText(13, "rgba(160,180,220,0.75)"), marginTop: 4, textAlign: "center", whiteSpace: "nowrap" }}>{credit}</div> : null}
+  </div>
+);
 
 /** Side-view car; (x, y) = ground under the middle of the car. */
 export const Car: React.FC<{ x: number; y: number; s?: number; lights?: number }> = ({ x, y, s = 1, lights = 0 }) => (
@@ -178,7 +188,7 @@ export const S01: React.FC = () => {
           </g>
         )}
       </Svg>
-      <L x={820} y={290} at={tJacket} center><span style={chip(C.accent)}>ქურთუკი თავზე</span></L>
+      <L x={820} y={300} at={tJacket} center><span style={chip(C.accent)}>ქურთუკი თავზე</span></L>
       <L x={250} y={600} at={tOpen}><span style={kaText(28, 800, C.yellow)}>საკანი იღება</span></L>
     </Stage>
   );
@@ -198,23 +208,23 @@ export const S02: React.FC = () => {
     <Stage>
       <Appear at={0} dy={20} style={{ ...card(C.accent), left: 0, top: 0, width: 960, height: 380, padding: 0, overflow: "hidden" }}>
         <div style={{ position: "absolute", left: 30, top: 30, width: 250, height: 300, borderRadius: 12, border: `2px solid ${C.accent}`, background: "rgba(52,227,220,0.06)", overflow: "hidden" }}>
-          <svg width={250} height={300} viewBox="0 0 250 300">
-            <circle cx={125} cy={115} r={58} fill="#3a4b78" />
-            <path d="M20 300 Q22 200 125 188 Q228 200 230 300 Z" fill="#3a4b78" />
+          <Img src={staticFile("photos/merabishvili.jpg")} style={{ position: "absolute", left: 0, top: 0, width: 250, height: 300, objectFit: "cover", objectPosition: "50% 20%", filter: `grayscale(${1 - useRamp(tName - 4, 14)})` }} />
+          <svg width={250} height={300} viewBox="0 0 250 300" style={{ position: "absolute", left: 0, top: 0 }}>
             <line x1={0} x2={250} y1={scan} y2={scan} stroke={C.accent} strokeWidth={2} opacity={0.5} />
           </svg>
         </div>
         <div style={{ position: "absolute", left: 310, top: 36, right: 30 }}>
-          <div style={monoText(22, C.dim)}>საქმე · Merabishvili v. Georgia</div>
+          <div style={monoText(22, C.dim)}>საქმე · Merabishvili v. Georgia · 72508/13</div>
           <Appear at={tName - 4} dx={-20} dy={0}>
             <div style={{ ...kaText(58, 900), marginTop: 10, lineHeight: 1.1 }}>ვანო</div>
             <div style={{ ...kaText(64, 900, C.accent), lineHeight: 1.15, textShadow: `0 0 20px ${C.accent}44` }}>მერაბიშვილი</div>
           </Appear>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, alignItems: "flex-start" }}>
             <Appear at={tFormer} dx={-20} dy={0}><span style={chip(C.yellow)}>ყოფილი პრემიერ-მინისტრი</span></Appear>
-            <Appear at={tFormer + 10} dx={-20} dy={0}><span style={chip(C.line)}>2013 წლის მაისიდან — პატიმრობაში</span></Appear>
+            <Appear at={tFormer + 10} dx={-20} dy={0}><span style={chip(C.line)}>21.05.2013-დან — პატიმრობაში</span></Appear>
           </div>
         </div>
+        <div style={{ position: "absolute", left: 30, top: 338, ...monoText(13, "rgba(160,180,220,0.75)") }}>ფოტო: საქართველოს მთავრობა / Wikimedia Commons</div>
       </Appear>
       {/* calendar page */}
       <Appear at={tDec} dy={24} style={{ ...card(C.yellow), left: 230, top: 430, width: 500, padding: 0, overflow: "hidden" }}>
@@ -303,21 +313,31 @@ export const S03: React.FC = () => {
       <L x={20} y={18} at={0}><span style={{ ...kaText(22, 700, C.dim), border: `2px solid ${C.dim}`, borderRadius: 6, padding: "2px 10px" }}>თბილისი · სქემა</span></L>
       <L x={720} y={340} at={4}><span style={{ ...kaText(22, 700, "#7aa6f0"), fontStyle: "italic" }}>მტკვარი</span></L>
       <L x={140} y={356} at={2} center><span style={kaText(26, 800)}>ციხე</span></L>
-      <L x={800} y={140} at={tBring} center style={{ textAlign: "center" }}>
-        <div style={kaText(26, 800, C.danger)}>მთავარი</div>
-        <div style={kaText(26, 800, C.danger)}>პროკურორი</div>
+      <L x={825} y={140} at={tBring} center style={{ textAlign: "center" }}>
+        <div style={kaText(22, 800, C.danger)}>სასჯელაღსრულების</div>
+        <div style={kaText(22, 800, C.danger)}>დეპარტამენტი</div>
+        <div style={{ ...kaText(20, 700, C.text), marginTop: 4 }}>იქ — მთავარი პროკურორი</div>
       </L>
-      <L x={250} y={190} at={8}><span style={monoText(24, C.yellow)}>01:30 →</span></L>
+      <L x={170} y={205} at={8}><span style={monoText(22, C.yellow)}>01:30 · ~10 წთ</span></L>
 
       {/* the alleged deal */}
       <L x={0} y={438} at={tDeal}><span style={chip(C.dim)}>მისი თქმით · შეთავაზება</span></L>
-      <Appear at={tInfo} dy={20} style={{ ...card(C.accent), left: 0, top: 500, width: 420, minHeight: 230 }}>
-        <div style={kaText(26, 700, C.dim)}>მოითხოვენ</div>
-        <div style={kaText(40, 900, C.accent)}>ინფორმაციას</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14, alignItems: "flex-start" }}>
-          <Appear at={tZh} dx={-16} dy={0}><span style={chip(C.yellow)}>ჟვანიას სიკვდილზე</span></Appear>
-          <Appear at={tSa} dx={-16} dy={0}><span style={chip(C.yellow)}>სააკაშვილის ანგარიშებზე</span></Appear>
+      <Appear at={tInfo} dy={20} style={{ ...card(C.accent), left: 0, top: 492, width: 430, padding: "14px 20px 12px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={kaText(22, 700, C.dim)}>მოითხოვენ</span>
+          <span style={kaText(30, 900, C.accent)}>ინფორმაციას</span>
         </div>
+        <div style={{ display: "flex", gap: 18, marginTop: 12 }}>
+          <Appear at={tZh} dy={16} style={{ width: 186, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Photo src="zhvania.jpg" size={130} color={C.yellow} />
+            <div style={{ ...kaText(22, 800, C.yellow), textAlign: "center", marginTop: 6 }}>ჟვანიას სიკვდილი</div>
+          </Appear>
+          <Appear at={tSa} dy={16} style={{ width: 186, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Photo src="saakashvili.jpg" size={130} color={C.yellow} />
+            <div style={{ ...kaText(22, 800, C.yellow), textAlign: "center", marginTop: 6 }}>სააკაშვილის ანგარიშები</div>
+          </Appear>
+        </div>
+        <div style={{ ...monoText(12, "rgba(160,180,220,0.7)"), marginTop: 6 }}>ფოტო: Andy Dunaway, USAF (PD); EPP, CC BY 2.0</div>
       </Appear>
       <L x={480} y={575} at={tLeave} center>
         <svg width={70} height={70} viewBox="0 0 70 70" style={{ transform: `translateX(${swap * 4}px)` }}>
@@ -336,7 +356,7 @@ export const S03: React.FC = () => {
           </svg>
         </Appear>
       </Appear>
-      <Sticker at={tDeal} text="გარიგება?" style={{ left: 640, top: 432 }} rotate={4} color={C.danger} />
+      <Sticker at={tDeal} text="გარიგება?" style={{ left: 700, top: 446 }} rotate={4} color={C.danger} />
     </Stage>
   );
 };
@@ -359,7 +379,7 @@ export const S04: React.FC = () => {
   const sx = 110, sy = 50, sw = 740, sh = 440;
   return (
     <Stage>
-      <L x={0} y={-6} at={0}><span style={chip(C.yellow)}>3 დღის შემდეგ</span></L>
+      <L x={0} y={536} at={0}><span style={chip(C.yellow)}>17.12.2013 · 3 დღის შემდეგ</span></L>
       <Svg>
         <GFade at={0} dur={8}>
           <rect x={80} y={20} width={800} height={500} rx={28} fill="#0a1430" stroke="rgba(213,230,255,0.5)" strokeWidth={4} />
@@ -414,12 +434,17 @@ export const S04: React.FC = () => {
           <span style={kaText(28, 900)}>პირდაპირი ეთერი</span>
         </div>
       </Appear>
-      <L x={sx + sw - 20} y={sy + 22} at={tCourt} style={{ transform: "translateX(-100%)" }}><span style={monoText(24, "#fff")}>LIVE</span></L>
-      {/* government response */}
-      <Appear at={tGov} dy={20} style={{ position: "absolute", left: 0, top: 610, display: "flex", alignItems: "center", gap: 20 }}>
-        <span style={chip(C.line)}>ხელისუფლება:</span>
+      <Appear at={tCourt} dy={0} dx={30} style={{ position: "absolute", left: sx + sw - 196, top: sy + 16, width: 180, opacity: on }}>
+        <div style={{ position: "relative", width: 180, height: 180, borderRadius: 10, overflow: "hidden", border: "3px solid #fff", boxShadow: "0 8px 30px rgba(0,0,0,0.6)" }}>
+          <Img src={staticFile("photos/merabishvili.jpg")} style={{ width: 180, height: 180, objectFit: "cover" }} />
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "rgba(4,10,28,0.85)", padding: "2px 0 4px", textAlign: "center", ...kaText(18, 800) }}>ვ. მერაბიშვილი</div>
+        </div>
       </Appear>
-      <DangerBlock at={tLie} style={{ left: 280, top: 594, padding: "10px 26px 14px" }}>
+      {/* government response */}
+      <Appear at={tGov} dy={20} style={{ position: "absolute", left: 0, top: 598, display: "flex", alignItems: "center", gap: 20 }}>
+        <span style={chip(C.line)}>ციხეების მინისტრი:</span>
+      </Appear>
+      <DangerBlock at={tLie} style={{ left: 0, top: 660, padding: "10px 26px 14px" }}>
         <span style={kaText(46, 900, C.danger)}>„აბსოლუტური ტყუილია“</span>
       </DangerBlock>
     </Stage>
@@ -488,7 +513,7 @@ export const S05: React.FC = () => {
       {/* bar 2: testimony */}
       <Appear at={tTest} dy={18} style={{ position: "absolute", left: 0, top: 520, width: BAR }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-          <span style={kaText(26, 700, C.dim)}>ჩვენება საქმეში</span>
+          <span style={kaText(26, 700, C.dim)}>ყოფ. მინისტრის მოადგილის ჩვენება</span>
           <span style={kaText(56, 900, C.accent)}>1 თვე</span>
         </div>
         <div style={{ position: "relative", height: 44, marginTop: 8, borderRadius: 8, background: "rgba(140,165,220,0.12)", border: "2px solid rgba(213,230,255,0.25)", overflow: "hidden" }}>

@@ -150,7 +150,7 @@ export const S07: React.FC = () => {
         <div style={kaText(40, 900)}>ოფიციალური მიზნით</div>
       </Appear>
       {ban > 0.01 && (
-        <svg width={170} height={170} style={{ position: "absolute", left: 740, top: 60, transform: `scale(${ban})`, opacity: Math.min(1, ban * 1.5) }}>
+        <svg width={170} height={170} viewBox="0 0 170 170" style={{ position: "absolute", left: 850, top: -10, width: 110, height: 110, transform: `scale(${ban})`, opacity: Math.min(1, ban * 1.5) }}>
           <circle cx={85} cy={85} r={70} fill="rgba(255,106,77,0.12)" stroke={C.danger} strokeWidth={10} />
           <line x1={36} y1={134} x2={134} y2={36} stroke={C.danger} strokeWidth={10} strokeLinecap="round" />
         </svg>

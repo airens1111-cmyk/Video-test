@@ -18,6 +18,24 @@ Every animation is cued to words in `data/timings.json` (via `cue()` in `src/tim
 | 09 | `S09` | lawful detention → path turns to "obtaining information" |
 | 10 | `S10` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
 
+## Fact check (HUDOC, judgment 001-178753, Grand Chamber, 28.11.2017)
+- §60: ~1.30 a.m., Saturday 14.12.2013, taken from Prison no. 9 in a car, head shrouded in his jacket,
+  to what he believed was the **Penitentiary Department building**, where the Chief Public Prosecutor was.
+  Told publicly at the hearing of 17.12.2013, broadcast live.
+- §61–62 (drive ~10 min); §68: Minister of Prisons called it "an absolute lie".
+- §74: footage kept "only twenty-four hours", then automatically deleted.
+- §77: affidavit of the former deputy Minister of Prisons: footage kept for a month.
+- §11: Prime Minister July–October 2012; §24: arrested 21.05.2013.
+- §335: no direct evidence, but indirect elements; §353: predominant purpose changed.
+- Operative part, point 8: violation of Article 18 with Article 5 § 1, **nine votes to eight**; 17 judges.
+
+## Photos (`public/photos/`, cropped)
+| file | source (Wikimedia Commons) | licence |
+|---|---|---|
+| merabishvili.jpg | File:Ivane Merabishvili (cropped).jpg — Government of Georgia | public domain |
+| zhvania.jpg | File:Surab Schwania.jpg — Andy Dunaway, U.S. Air Force | public domain |
+| saakashvili.jpg | File:Mikheil Saakashvili (9798043996).jpg — European People's Party | CC BY 2.0 (credit shown in scene 03) |
+
 ## Files
 - `src/config.ts` — channel, colours, fonts, voice, safe zones.
 - `data/script.json` — narration per scene; `data/timings.json` — word timings (ElevenLabs).

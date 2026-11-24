@@ -4,3 +4,5 @@ video/out/
 __pycache__/
 video-merab/node_modules
 video-merab/.tts_cache/
+video-sugar/node_modules
+video-sugar/.tts_cache/

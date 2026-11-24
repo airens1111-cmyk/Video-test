@@ -18,6 +18,14 @@ Every animation is cued to words in `data/timings.json` (via `cue()` in `src/tim
 | 09 | `S09` | lawful detention → path turns to "obtaining information" |
 | 10 | `S10` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
 
+## Re-voicing one scene
+After editing one scene's text in `data/script.json`:
+```bash
+ELEVENLABS_API_KEY=... python3 tools/revoice_scene.py s04   # only that scene, same voice and loudness
+python3 tools/audio_mix.py                                  # rebuild public/mix.wav
+```
+Later scenes' timings shift automatically; scene animations are cued to words, so they follow.
+
 ## Fact check (HUDOC, judgment 001-178753, Grand Chamber, 28.11.2017)
 - §60: ~1.30 a.m., Saturday 14.12.2013, taken from Prison no. 9 in a car, head shrouded in his jacket,
   to what he believed was the **Penitentiary Department building**, where the Chief Public Prosecutor was.

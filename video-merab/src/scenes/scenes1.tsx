@@ -368,7 +368,7 @@ export const S04: React.FC = () => {
   const tCourt = cue(id, "სასამართლოში");
   const tLive = cue(id, "პირდაპირ");
   const tTell = cue(id, "ყვება");
-  const tGov = cue(id, "ხელისუფლება");
+  const tGov = cue(id, "პასუხობს") - 12;
   const tLie = cue(id, "აბსოლუტური");
   // CRT power-on: a line, then the picture opens up
   const on = interpolate(f, [2, 12], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
@@ -442,7 +442,7 @@ export const S04: React.FC = () => {
       </Appear>
       {/* government response */}
       <Appear at={tGov} dy={20} style={{ position: "absolute", left: 0, top: 598, display: "flex", alignItems: "center", gap: 20 }}>
-        <span style={chip(C.line)}>ციხეების მინისტრი:</span>
+        <span style={chip(C.line)}>სასჯელაღსრულების მინისტრი:</span>
       </Appear>
       <DangerBlock at={tLie} style={{ left: 0, top: 660, padding: "10px 26px 14px" }}>
         <span style={kaText(46, 900, C.danger)}>„აბსოლუტური ტყუილია“</span>

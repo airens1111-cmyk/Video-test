@@ -10,39 +10,38 @@ const C = config.colors;
 const PINK = "#FF7EB6";
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
-/** Slice of layered cake (ნამცხვარი), centre (x, y), size r; `bite` 0..1 takes a bite out of the tip. */
+/** Slice of honey cake (медовик / თაფლის ნამცხვარი), centre (x, y), size r; `bite` 0..1 bites the front. */
 const Cake: React.FC<{ x: number; y: number; r: number; bite?: number; glow?: number }> = ({ x, y, r, bite = 0, glow = 0 }) => {
   const id = `cbite${x}${y}`;
-  // side view of a wedge: tip on the left, back on the right
-  const L = x - r, R = x + r * 0.9, T = y - r * 0.55, B = y + r * 0.55;
-  const layers = [0, 1, 2, 3];
-  const lh = (B - T) / 4;
+  const L = x - r, R = x + r * 0.9, T = y - r * 0.6, B = y + r * 0.55;
+  const n = 8; // thin honey layers
+  const h = (B - T) / (n * 1.45);
   return (
     <g>
       <defs>
         <mask id={id}>
           <rect x={L - 20} y={T - r} width={2.2 * r} height={3 * r} fill="#fff" />
-          {bite > 0 && [0, 1, 2].map((k) => <circle key={k} cx={L + r * 0.05} cy={T + lh * (0.6 + k * 1.1)} r={r * 0.26 * bite} fill="#000" />)}
+          {bite > 0 && [0, 1, 2].map((k) => <circle key={k} cx={L + r * 0.05} cy={T + (B - T) * (0.2 + k * 0.3)} r={r * 0.24 * bite} fill="#000" />)}
         </mask>
       </defs>
-      {glow > 0 && <ellipse cx={x} cy={y} rx={r * 1.3} ry={r} fill="#FF7EB6" opacity={0.15 * glow} />}
+      {glow > 0 && <ellipse cx={x} cy={y} rx={r * 1.3} ry={r} fill={C.yellow} opacity={0.14 * glow} />}
       <g mask={`url(#${id})`}>
-        {/* plate shadow */}
         <ellipse cx={x} cy={B + 10} rx={r * 1.05} ry={r * 0.12} fill="rgba(0,0,0,0.35)" />
-        {/* sponge and cream layers */}
-        {layers.map((k) => (
-          <rect key={k} x={L} y={T + k * lh} width={R - L} height={lh} fill={k % 2 ? "#FFF1E6" : "#C98A4B"} />
-        ))}
+        {/* cream body, then honey layers on top of it */}
+        <rect x={L} y={T} width={R - L} height={B - T} fill="#FFF3DC" />
+        {Array.from({ length: n }, (_, k) => {
+          const yy = T + 12 + k * ((B - T - 12) / n);
+          return <rect key={k} x={L} y={yy} width={R - L} height={h} rx={2} fill={k % 2 ? "#D08A3A" : "#C77B2C"} />;
+        })}
         {/* back face */}
-        <rect x={R - 6} y={T} width={16} height={B - T} fill="#a86c35" />
-        {/* top icing with drips */}
-        <path d={`M${L} ${T} L${R + 10} ${T} L${R + 10} ${T + 18} Q${R - r * 0.1} ${T + 40} ${R - r * 0.25} ${T + 18} Q${x} ${T + 46} ${x - r * 0.2} ${T + 16} Q${L + r * 0.4} ${T + 36} ${L + r * 0.2} ${T + 14} L${L} ${T + 14} Z`} fill="#FF7EB6" />
-        {/* cream swirl and cherry */}
-        <ellipse cx={x + r * 0.4} cy={T - 16} rx={r * 0.22} ry={r * 0.13} fill="#FFF1E6" />
-        <ellipse cx={x + r * 0.4} cy={T - 30} rx={r * 0.13} ry={r * 0.09} fill="#FFF1E6" />
-        <circle cx={x + r * 0.4} cy={T - 52} r={r * 0.13} fill="#d81f3f" />
-        <path d={`M${x + r * 0.4} ${T - 62} q 10 -30 34 -36`} fill="none" stroke="#3a7a2a" strokeWidth={4} strokeLinecap="round" />
-        <circle cx={x + r * 0.36} cy={T - 58} r={r * 0.035} fill="#fff" opacity={0.7} />
+        <rect x={R - 6} y={T} width={16} height={B - T} fill="#b06a24" />
+        {/* crumb top */}
+        <rect x={L} y={T - 8} width={R - L + 10} height={20} rx={6} fill="#D9963F" />
+        {Array.from({ length: 34 }, (_, k) => (
+          <circle key={k} cx={L + 6 + seeded(k + 7) * (R - L)} cy={T - 8 + seeded(k + 70) * 16} r={3 + 4 * seeded(k + 140)} fill={k % 3 ? "#B8732B" : "#E8B266"} />
+        ))}
+        {/* honey drip */}
+        <path d={`M${x + r * 0.3} ${T + 8} q 6 26 0 34 q -8 -4 -4 -34 Z`} fill="#F7B733" opacity={0.95} />
       </g>
     </g>
   );

@@ -10,27 +10,39 @@ const C = config.colors;
 const PINK = "#FF7EB6";
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
-/** Glazed donut, centre (x, y), radius r; `bite` 0..1 takes a bite out of the top right. */
-const Donut: React.FC<{ x: number; y: number; r: number; bite?: number; glow?: number }> = ({ x, y, r, bite = 0, glow = 0 }) => {
-  const id = `bite${x}${y}`;
+/** Slice of layered cake (ნამცხვარი), centre (x, y), size r; `bite` 0..1 takes a bite out of the tip. */
+const Cake: React.FC<{ x: number; y: number; r: number; bite?: number; glow?: number }> = ({ x, y, r, bite = 0, glow = 0 }) => {
+  const id = `cbite${x}${y}`;
+  // side view of a wedge: tip on the left, back on the right
+  const L = x - r, R = x + r * 0.9, T = y - r * 0.55, B = y + r * 0.55;
+  const layers = [0, 1, 2, 3];
+  const lh = (B - T) / 4;
   return (
     <g>
       <defs>
         <mask id={id}>
-          <rect x={x - r - 10} y={y - r - 10} width={2 * r + 20} height={2 * r + 20} fill="#fff" />
-          {bite > 0 && [0, 1, 2].map((k) => <circle key={k} cx={x + r * 0.62 + k * r * 0.18 - r * 0.18} cy={y - r * 0.78 + k * r * 0.16} r={r * 0.24 * bite} fill="#000" />)}
+          <rect x={L - 20} y={T - r} width={2.2 * r} height={3 * r} fill="#fff" />
+          {bite > 0 && [0, 1, 2].map((k) => <circle key={k} cx={L + r * 0.05} cy={T + lh * (0.6 + k * 1.1)} r={r * 0.26 * bite} fill="#000" />)}
         </mask>
       </defs>
-      {glow > 0 && <circle cx={x} cy={y} r={r * 1.25} fill={PINK} opacity={0.15 * glow} />}
+      {glow > 0 && <ellipse cx={x} cy={y} rx={r * 1.3} ry={r} fill="#FF7EB6" opacity={0.15 * glow} />}
       <g mask={`url(#${id})`}>
-        <circle cx={x} cy={y} r={r} fill="#d9a066" />
-        <path d={`M${x - r * 0.95} ${y - r * 0.1} Q${x - r * 0.8} ${y - r * 0.95} ${x} ${y - r * 0.92} Q${x + r * 0.85} ${y - r * 0.95} ${x + r * 0.95} ${y - r * 0.05} Q${x + r * 0.7} ${y + r * 0.35} ${x + r * 0.4} ${y + r * 0.2} Q${x} ${y + r * 0.55} ${x - r * 0.45} ${y + r * 0.25} Q${x - r * 0.75} ${y + r * 0.4} ${x - r * 0.95} ${y - r * 0.1} Z`} fill={PINK} />
-        {Array.from({ length: 14 }, (_, i) => {
-          const a = seeded(i + 3) * Math.PI * 2, d = r * (0.45 + 0.35 * seeded(i + 40));
-          const sx = x + Math.cos(a) * d, sy = y - Math.abs(Math.sin(a)) * d * 0.8;
-          return <rect key={i} x={sx - 7} y={sy - 2.5} width={14} height={5} rx={2.5} fill={[C.yellow, C.accent, "#fff", "#8FB3FF"][i % 4]} transform={`rotate(${seeded(i + 90) * 180} ${sx} ${sy})`} />;
-        })}
-        <circle cx={x} cy={y} r={r * 0.3} fill={C.bgBottom} />
+        {/* plate shadow */}
+        <ellipse cx={x} cy={B + 10} rx={r * 1.05} ry={r * 0.12} fill="rgba(0,0,0,0.35)" />
+        {/* sponge and cream layers */}
+        {layers.map((k) => (
+          <rect key={k} x={L} y={T + k * lh} width={R - L} height={lh} fill={k % 2 ? "#FFF1E6" : "#C98A4B"} />
+        ))}
+        {/* back face */}
+        <rect x={R - 6} y={T} width={16} height={B - T} fill="#a86c35" />
+        {/* top icing with drips */}
+        <path d={`M${L} ${T} L${R + 10} ${T} L${R + 10} ${T + 18} Q${R - r * 0.1} ${T + 40} ${R - r * 0.25} ${T + 18} Q${x} ${T + 46} ${x - r * 0.2} ${T + 16} Q${L + r * 0.4} ${T + 36} ${L + r * 0.2} ${T + 14} L${L} ${T + 14} Z`} fill="#FF7EB6" />
+        {/* cream swirl and cherry */}
+        <ellipse cx={x + r * 0.4} cy={T - 16} rx={r * 0.22} ry={r * 0.13} fill="#FFF1E6" />
+        <ellipse cx={x + r * 0.4} cy={T - 30} rx={r * 0.13} ry={r * 0.09} fill="#FFF1E6" />
+        <circle cx={x + r * 0.4} cy={T - 52} r={r * 0.13} fill="#d81f3f" />
+        <path d={`M${x + r * 0.4} ${T - 62} q 10 -30 34 -36`} fill="none" stroke="#3a7a2a" strokeWidth={4} strokeLinecap="round" />
+        <circle cx={x + r * 0.36} cy={T - 58} r={r * 0.035} fill="#fff" opacity={0.7} />
       </g>
     </g>
   );
@@ -56,11 +68,11 @@ export const S01: React.FC = () => {
       </div>
       <Svg>
         <GPop at={tCake - 6} cx={270} cy={500}>
-          <Donut x={270} y={500 + float} r={150} bite={bite} />
+          <Cake x={270} y={500 + float} r={150} bite={bite} />
         </GPop>
         {second > 0.01 && (
           <g transform={`translate(${680 + (1 - second) * 200} ${500 - float}) scale(${second}) translate(-680 -500)`}>
-            <Donut x={680} y={500} r={150} glow={glow} />
+            <Cake x={680} y={500} r={150} glow={glow} />
           </g>
         )}
         <DrawPath at={tSecond} dur={10} d="M440 500 L520 500" stroke={C.yellow} strokeWidth={6} />

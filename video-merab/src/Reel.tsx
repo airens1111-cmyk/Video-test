@@ -5,9 +5,10 @@ import { timings, FPS, toFrames } from "./timing";
 import { Background, Fonts, Header, ProgressBar, SectionLabel, sceneTransform, sceneFrames, TransitionSweep } from "./components/chrome";
 import { Subtitles } from "./components/Subtitles";
 import { S01, S02, S03, S04, S05 } from "./scenes/scenes1";
-import { S06, S07, S08, S09, S10 } from "./scenes/scenes2";
+import { S06, S07, S08, S09, S10, S11 } from "./scenes/scenes3";
+import { S12, S13 } from "./scenes/scenes2";
 
-const SCENES: Record<string, React.FC> = { s01: S01, s02: S02, s03: S03, s04: S04, s05: S05, s06: S06, s07: S07, s08: S08, s09: S09, s10: S10 };
+const SCENES: Record<string, React.FC> = { s01: S01, s02: S02, s03: S03, s04: S04, s05: S05, s06: S06, s07: S07, s08: S08, s09: S09, s10: S10, s11: S11, s12: S12, s13: S13 };
 const meta = scriptJson.scenes as { id: string; tag: string; label: string }[];
 
 const SceneWrap: React.FC<{ dur: number; first: boolean; children: React.ReactNode }> = ({ dur, first, children }) => {
@@ -39,7 +40,7 @@ export const Reel: React.FC = () => {
         return (
           <Sequence key={s.id} from={from} durationInFrames={dur} name={`${s.id} ${meta[i].label}`}>
             <SceneWrap dur={dur} first={i === 0}>
-              <SectionLabel n={i + 1} label={meta[i].label} danger={["s05", "s07"].includes(s.id)} />
+              <SectionLabel n={i + 1} label={meta[i].label} danger={["s05", "s08"].includes(s.id)} />
               <Comp />
             </SceneWrap>
           </Sequence>

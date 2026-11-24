@@ -4,19 +4,24 @@ Vertical 1080×1920, 30 fps Georgian reel about the ECtHR Grand Chamber judgment
 *Merabishvili v. Georgia* (28.11.2017). Same look and components as `../video/`.
 Every animation is cued to words in `data/timings.json` (via `cue()` in `src/timing.ts`).
 
-## Scenes
+## Scenes (13, about 2:42)
 | # | file | picture |
 |---|------|---------|
 | 01 | scenes1.tsx `S01` | night prison, clock 01:29 → 01:30, cell opens, jacket over the head, car drives off |
-| 02 | `S02` | case card (silhouette, no photo), "former PM", calendar December 2013 |
-| 03 | `S03` | Tbilisi scheme (Mtkvari, streets), car route prison → chief prosecutor; the alleged deal |
-| 04 | `S04` | TV, courtroom live broadcast, ticker; government: "absolute lie" |
-| 05 | `S05` | CCTV camera, REC 01:30; bars "24 hours" vs "1 month" (to scale, 1:30) |
-| 06 | scenes2.tsx `S06` | Europe map (Natural Earth), flight Tbilisi → Strasbourg, ECHR; Article 18 card |
-| 07 | `S07` | official purpose vs hidden purpose, proof meter stuck at ~7% |
-| 08 | `S08` | "direct evidence not required", mosaic of facts, stamp "night story confirmed" |
-| 09 | `S09` | lawful detention → path turns to "obtaining information" |
-| 10 | `S10` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
+| 02 | `S02` | case card with photo, "former PM", in custody since 21.05.2013 (~7 months), calendar December 2013 |
+| 03 | `S03` | Tbilisi scheme, car route prison → Penitentiary Department; the alleged deal with photos |
+| 04 | `S04` | TV live from the courtroom (17.12.2013); Minister of Corrections: "absolute lie" |
+| 05 | `S05` | CCTV camera; bars "24 hours" vs "1 month" (former deputy minister) |
+| 06 | scenes3.tsx `S06` | flight Tbilisi → Strasbourg; Article 18; why it is hard: presumed good faith, direct proof |
+| 07 | `S07` | lawyers' two lines (political persecution / night meeting); application 20.11.2013 → meeting 3 weeks later → folded into the existing complaint |
+| 08 | `S08` | Government: new complaint, six months expired; Grand Chamber: same complaint (§§ 249–251) |
+| 09 | `S09` | Chamber 14.06.2016 (7 judges) → Grand Chamber (17); political line fails (§ 329) |
+| 10 | `S10` | new rule: legitimate + hidden purpose, the predominant one counts, can change over time (§§ 305–308) |
+| 11 | `S11` | evidence: official fired after telling the press (§ 338), late statements (§ 347), prosecutor's alibi timeline (§ 348), proven (§ 350) |
+| 12 | scenes2.tsx `S12` | lawful detention → path turns to "obtaining information" (§ 353) |
+| 13 | `S13` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
+
+Voice tempo is 1.18 (`src/config.ts`); changing it re-uses the cached ElevenLabs responses.
 
 ## Re-voicing one scene
 After editing one scene's text in `data/script.json`:

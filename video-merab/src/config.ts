@@ -16,7 +16,7 @@ export const config = {
     model: "eleven_v4",
     language: "ka",
     // eleven_v4 ignores voice_settings.speed, so the audio is time-stretched (pitch kept)
-    tempo: "1.12",
+    tempo: "1.18",
   },
   edgeVoice: {
     name: "ka-GE-GiorgiNeural",

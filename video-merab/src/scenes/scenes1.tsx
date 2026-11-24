@@ -221,7 +221,7 @@ export const S02: React.FC = () => {
           </Appear>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, alignItems: "flex-start" }}>
             <Appear at={tFormer} dx={-20} dy={0}><span style={chip(C.yellow)}>ყოფილი პრემიერ-მინისტრი</span></Appear>
-            <Appear at={tFormer + 10} dx={-20} dy={0}><span style={chip(C.line)}>21.05.2013-დან — პატიმრობაში</span></Appear>
+            <Appear at={cue(id, "შვიდი")} dx={-20} dy={0}><span style={chip(C.line)}>21.05.2013-დან · თითქმის 7 თვე</span></Appear>
           </div>
         </div>
         <div style={{ position: "absolute", left: 30, top: 338, ...monoText(13, "rgba(160,180,220,0.75)") }}>ფოტო: საქართველოს მთავრობა / Wikimedia Commons</div>
@@ -459,7 +459,7 @@ export const S05: React.FC = () => {
   const tGov = sentenceStart(id, 1);
   const tOnly = cue(id, "მხოლოდ");
   const tDel = cue(id, "იშლება");
-  const tTest = cue(id, "ჩვენება");
+  const tTest = cue(id, "მოადგილე") - 8;
   const tMonth = cue(id, "ერთი");
   const tKept = cue(id, "ინახებოდა");
   const swing = Math.sin(f / 30) * 12;

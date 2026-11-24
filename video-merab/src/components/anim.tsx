@@ -34,7 +34,7 @@ export const Appear: React.FC<{
   const p = usePop(at);
   const o = Math.min(1, Math.max(0, p * 1.6));
   return (
-    <div style={{ opacity: o, transform: `translate(${(1 - p) * dx}px, ${(1 - p) * dy}px) scale(${0.92 + 0.08 * p})`, ...style }}>
+    <div style={{ ...style, opacity: o * (style?.opacity === undefined ? 1 : Number(style.opacity)), transform: `translate(${(1 - p) * dx}px, ${(1 - p) * dy}px) scale(${0.92 + 0.08 * p})${style?.transform ? " " + style.transform : ""}` }}>
       {children}
     </div>
   );

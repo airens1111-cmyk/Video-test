@@ -153,7 +153,7 @@ export const S04: React.FC = () => {
   const f = useCurrentFrame();
   const tFlorey = cue(id, "ფლორი");
   const tChain = cue(id, "ჩეინი");
-  const tPure = cue(id, "გასუფთავებას");
+  const tPure = cue(id, "მიღებაზე");
   const drip = interpolate(f, [tPure - 4, tPure + 30], [0, 1], clamp);
   const fill = useRamp(tPure + 10, 24);
   return (
@@ -176,7 +176,7 @@ export const S04: React.FC = () => {
         {drip > 0 && drip < 1 && <circle cx={520} cy={510 + ((drip * 4) % 1) * 60} r={9} fill={C.yellow} />}
         <DrawPath at={tPure + 4} dur={12} d="M560 560 L670 560" stroke={C.yellow} strokeWidth={5} />
       </Svg>
-      <L x={735} y={660} at={tPure + 10} center><span style={chip(C.yellow)}>სუფთა პენიცილინი</span></L>
+      <L x={735} y={660} at={tPure + 10} center><span style={chip(C.yellow)}>პენიცილინის მიღება</span></L>
     </Stage>
   );
 };
@@ -187,7 +187,7 @@ export const S05: React.FC = () => {
   const f = useCurrentFrame();
   const tBetter = cue(id, "უკეთ");
   const tUrine = cue(id, "შარდიდანაც");
-  const tOut = cue(id, "მარაგი");
+  const tOut = cue(id, "ჰყოფნის");
   const tDied = cue(id, "იღუპება");
   const line = interpolate(f, [tBetter - 10, tDied + 14], [0, 1], clamp);
   const supply = interpolate(f, [tBetter, tOut + 16], [1, 0], clamp);
@@ -197,7 +197,7 @@ export const S05: React.FC = () => {
   const spin = f * 3;
   return (
     <Stage>
-      <L x={0} y={0} at={-4}><span style={kaText(40, 900, C.yellow)}>1941 · პირველი პაციენტი</span></L>
+      <L x={0} y={0} at={-4}><span style={kaText(40, 900, C.yellow)}>1941 · ერთ-ერთი პირველი პაციენტი</span></L>
       <L x={0} y={60} at={0}><span style={monoText(20)}>Albert Alexander, პოლიციელი</span></L>
       <Svg>
         <path d="M60 180 L60 520 L600 520" fill="none" stroke="rgba(213,230,255,0.5)" strokeWidth={2.5} />
@@ -216,7 +216,7 @@ export const S05: React.FC = () => {
       <L x={790} y={130} at={0} center><span style={kaText(24, 800, C.dim)}>მარაგი</span></L>
       <L x={600} y={680} at={tUrine}><span style={chip(C.yellow)}>შარდიდან აგროვებენ</span></L>
       <DangerBlock at={tDied} style={{ left: 120, top: 560 }}>
-        <span style={kaText(32, 900, C.danger)}>მარაგი დამთავრდა</span>
+        <span style={kaText(32, 900, C.danger)}>წამალი არ ეყო</span>
       </DangerBlock>
     </Stage>
   );
@@ -230,7 +230,7 @@ export const S06: React.FC = () => {
   const tMelon = cue(id, "ნესვმა");
   const tMore = cue(id, "ბევრად");
   const t44 = cue(id, "1944");
-  const tMill = cue(id, "მილიონობით");
+  const tMill = cue(id, "მასობრივად");
   const flow = (f * 6) % 120;
   return (
     <Stage>
@@ -261,7 +261,7 @@ export const S06: React.FC = () => {
       <L x={740} y={140} at={tMore} center><span style={chip(C.accent)}>ბევრად მეტი პენიცილინი</span></L>
       <Appear at={t44} dy={20} style={{ ...card(C.yellow), left: 160, top: 560, width: 640, textAlign: "center" }}>
         <div style={kaText(28, 800, C.dim)}>1944 წლისთვის</div>
-        <Appear at={tMill} dy={0}><div style={kaText(48, 900, C.yellow)}>მილიონობით დოზა</div></Appear>
+        <Appear at={tMill} dy={0}><div style={kaText(48, 900, C.yellow)}>მასობრივი წარმოება</div></Appear>
       </Appear>
     </Stage>
   );

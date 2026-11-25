@@ -1,0 +1,68 @@
+# Reel: «მერაბიშვილი საქართველოს წინააღმდეგ» (Remotion)
+
+Vertical 1080×1920, 30 fps Georgian reel about the ECtHR Grand Chamber judgment
+*Merabishvili v. Georgia* (28.11.2017). Same look and components as `../video/`.
+Every animation is cued to words in `data/timings.json` (via `cue()` in `src/timing.ts`).
+
+## Scenes (13, about 2:42)
+| # | file | picture |
+|---|------|---------|
+| 01 | scenes1.tsx `S01` | night prison, clock 01:29 → 01:30, cell opens, jacket over the head, car drives off |
+| 02 | `S02` | case card with photo, "former PM", in custody since 21.05.2013 (~7 months), calendar December 2013 |
+| 03 | `S03` | Tbilisi scheme, car route prison → Penitentiary Department; the alleged deal with photos |
+| 04 | `S04` | TV live from the courtroom (17.12.2013); Minister of Corrections: "absolute lie" |
+| 05 | `S05` | CCTV camera; bars "24 hours" vs "1 month" (former deputy minister) |
+| 06 | scenes3.tsx `S06` | flight Tbilisi → Strasbourg; Article 18; why it is hard: presumed good faith, direct proof |
+| 07 | `S07` | lawyers' two lines (political persecution / night meeting); application 20.11.2013 → meeting 3 weeks later → folded into the existing complaint |
+| 08 | `S08` | Government: new complaint, six months expired; Grand Chamber: same complaint (§§ 249–251) |
+| 09 | `S09` | Chamber 14.06.2016 (7 judges) → Grand Chamber (17); political line fails (§ 329) |
+| 10 | `S10` | new rule: legitimate + hidden purpose, the predominant one counts, can change over time (§§ 305–308) |
+| 11 | `S11` | evidence: official fired after telling the press (§ 338), late statements (§ 347), prosecutor's alibi timeline (§ 348), proven (§ 350) |
+| 12 | scenes2.tsx `S12` | lawful detention → path turns to "obtaining information" (§ 353) |
+| 13 | `S13` | Grand Chamber 17 seats, vote 9 : 8, "prison ≠ tool of pressure", outro |
+
+Voice tempo is 1.18 (`src/config.ts`); changing it re-uses the cached ElevenLabs responses.
+
+## Re-voicing one scene
+After editing one scene's text in `data/script.json`:
+```bash
+ELEVENLABS_API_KEY=... python3 tools/revoice_scene.py s04   # only that scene, same voice and loudness
+python3 tools/audio_mix.py                                  # rebuild public/mix.wav
+```
+Later scenes' timings shift automatically; scene animations are cued to words, so they follow.
+
+## Fact check (HUDOC, judgment 001-178753, Grand Chamber, 28.11.2017)
+- §60: ~1.30 a.m., Saturday 14.12.2013, taken from Prison no. 9 in a car, head shrouded in his jacket,
+  to what he believed was the **Penitentiary Department building**, where the Chief Public Prosecutor was.
+  Told publicly at the hearing of 17.12.2013, broadcast live.
+- §200: drive of about ten minutes; §70: Minister of Prisons called it "an absolute lie".
+- §74: footage kept "only twenty-four hours", then automatically deleted.
+- §77: affidavit of the former deputy Minister of Prisons: footage kept for a month.
+- §11: Prime Minister July–October 2012; §24: arrested 21.05.2013.
+- §335: no direct evidence, but indirect elements; §353: predominant purpose changed.
+- Operative part, point 8: violation of Article 18 with Article 5 § 1, **nine votes to eight**; 17 judges.
+
+## Photos (`public/photos/`, cropped)
+| file | source (Wikimedia Commons) | licence |
+|---|---|---|
+| merabishvili.jpg | File:Ivane Merabishvili.jpg — Government of Georgia | public domain |
+| zhvania.jpg | File:Surab Schwania.jpg — Andy Dunaway, U.S. Air Force | public domain |
+| saakashvili.jpg | File:Mikheil Saakashvili (9798043996).jpg — European People's Party | CC BY 2.0 (credit shown in scene 03) |
+
+## Files
+- `src/config.ts` — channel, colours, fonts, voice, safe zones.
+- `data/script.json` — narration per scene; `data/timings.json` — word timings (ElevenLabs).
+- `data/keywords.json` — subtitle words coloured accent / yellow / danger.
+- `data/europe.json` — Europe country outlines for scene 06, projected from Natural Earth 1:50m
+  (`world-atlas@2.0.2`, public domain), equirectangular lon −11…50, lat 34…61.
+- `public/mix.wav` — voice + music/SFX mix used by the reel.
+
+## Build
+```bash
+cd video-merab
+npm ci
+npx remotion studio src/index.ts                       # preview
+npx remotion render src/index.ts Reel ../output/raw.mp4 # add --browser-executable=... if Chrome cannot be downloaded
+ffmpeg -i ../output/raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" \
+  -c:v libx264 -profile:v high -crf 18 -movflags +faststart -c:a copy ../output/merabishvili_ka.mp4
+```

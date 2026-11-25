@@ -1,0 +1,22 @@
+{
+ "_comment": "Subtitle keyword colours. Key = word start (punctuation ignored), value = colour key from config.colors.",
+ "ნამცხვარი": "yellow",
+ "მეორე": "yellow",
+ "დოფამინს": "accent",
+ "ჯილდოს": "accent",
+ "გაიმეორე": "yellow",
+ "გლუკოზა": "yellow",
+ "ინსულინს": "accent",
+ "ეცემა": "danger",
+ "დაღლილობა": "danger",
+ "სურვილი": "danger",
+ "ცხრა": "danger",
+ "ექვს": "accent",
+ "გაძღომის": "yellow",
+ "დიაგნოზი": "yellow",
+ "ჩვევა": "accent",
+ "ცილასთან": "accent",
+ "ბოჭკოსთან": "accent",
+ "წყლით": "accent",
+ "გამოიწერე": "accent"
+}
